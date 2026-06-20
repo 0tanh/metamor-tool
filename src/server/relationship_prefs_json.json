@@ -1,0 +1,835 @@
+{
+  "icon": ["must", "like", "maybe", "prefer-not", "off-limit", "talk"],
+  "preferences": [
+    {
+      "name": "Texting",
+      "icon": "like",
+      "note": "can be prelaced with talking!! i like talking but if you're gone then as long as i know where you are and that you are ok im good"
+    },
+    {
+      "name": "Phone / video calls",
+      "icon": "must",
+      "note": "if you're gone more than like 2 days please please please because i can invent subtext that isnt there in texts"
+    },
+    {
+      "name": "Discussing work and hobbies",
+      "icon": "like",
+      "note": "i like talking to you and spending time inside your brain"
+    },
+    {
+      "name": "Discussing family, partners, relationships",
+      "icon": "must",
+      "note": "esp re:partners. I get worried if you are not open about them"
+    },
+    {
+      "name": "Discussing politics and current events",
+      "icon": "like",
+      "note": "i like talking to you"
+    },
+    {
+      "name": "Ability to express disagreements or hurt feelings",
+      "icon": "must",
+      "note": "I want to be better and I want to not hurt you"
+    },
+    {
+      "name": "Ability to address and resolve conflict",
+      "icon": "must",
+      "note": "I want to be better and not hurt you again"
+    },
+    {
+      "name": "Relationship meetings (e.g. R.A.D.A.R.)",
+      "icon": "talk",
+      "note": "I worry about how clinical this feels and would maybe make me jump off it but would be willing to try"
+    },
+    {
+      "name": "Nonviolent Communication",
+      "icon": "must",
+      "note": "for obvious reasons"
+    },
+    {
+      "name": "Radical honesty",
+      "icon": "must",
+      "note": "I want to know so that I can change and be better. I am working to be more honest with you but vulnerability feels like dying and I would almost always rather die than open myself up to rejection"
+    },
+    {
+      "name": "Teaching each other things",
+      "icon": "like",
+      "note": "I like being inside your brain"
+    },
+    {
+      "name": "Working on projects together",
+      "icon": "maybe",
+      "note": "I just worry abt needless conflict but that is due to my rejection fear"
+    },
+    {
+      "name": "Being creative together",
+      "icon": "like",
+      "note": "Big yes"
+    },
+    {
+      "name": "Sharing a hobby or interest",
+      "icon": "like",
+      "note": "i like spending time with you in your brain"
+    },
+    {
+      "name": "Having shared beliefs",
+      "icon": "must",
+      "note": "I think at least having a basic common ground is NB but we already lowkey do"
+    },
+    {
+      "name": "Praying together",
+      "icon": "off-limit",
+      "note": "lol"
+    },
+    {
+      "name": "Having shared rituals",
+      "icon": "maybe",
+      "note": "I am ok with it because i <3 intimacy"
+    },
+    {
+      "name": "Ceremonies & traditions",
+      "icon": "talk",
+      "note": "no idea what this would entail"
+    },
+    {
+      "name": "Religious & spiritual beliefs",
+      "icon": "off-limit",
+      "note": "lol"
+    },
+    {
+      "name": "Colleagues",
+      "icon": "talk",
+      "note": "I try to hard seperate personal and business relationships because I dont want to ruin a good personal relationship because of business stuff"
+    },
+    {
+      "name": "Business partners",
+      "icon": "maybe",
+      "note": "ditto. person"
+    },
+    {
+      "name": "Work-related stress support",
+      "icon": "must",
+      "note": "I want to help you manage where i can"
+    },
+    {
+      "name": "Impact of work on the relationship",
+      "icon": "must",
+      "note": "Work comes first always. Like. Always."
+    },
+    {
+      "name": "Sharing passwords to phones or computers",
+      "icon": "prefer-not",
+      "note": "My digital identity is my own my computer is a big part of my soul. Having a walled method to get in might be important in case of emergency but rather not"
+    },
+    {
+      "name": "Accessing phones or computers without asking",
+      "icon": "off-limit",
+      "note": "No"
+    },
+    {
+      "name": "Sharing internet accounts",
+      "icon": "off-limit",
+      "note": "No"
+    },
+    {
+      "name": "Real-time location sharing",
+      "icon": "off-limit",
+      "note": "Excepting expecting danger. I trust you enough to be honest with me. I dont like panopticon. It needs to be your choice to be honest."
+    },
+    {
+      "name": "Device-free time together",
+      "icon": "like",
+      "note": "i like spending time with you"
+    },
+    {
+      "name": "Shared goals in life",
+      "icon": "like",
+      "note": "Not sure what this would entail but would help. Ultimately we are two seperate people constantly making choice"
+    },
+    {
+      "name": "Shared values",
+      "icon": "like",
+      "note": "Again we lowk have that already"
+    },
+    {
+      "name": "Having a routine together",
+      "icon": "like",
+      "note": "i <3 intimacy"
+    },
+    {
+      "name": "Embracing change in one another",
+      "icon": "must",
+      "note": "You and I will be different and want to grow and become different all the time. Two chains choosing to be next to"
+    },
+    {
+      "name": "Consistency",
+      "icon": "like",
+      "note": "Not entirely sure what this means"
+    },
+    {
+      "name": "Reliability",
+      "icon": "must",
+      "note": "For obvious reasons atm"
+    },
+    {
+      "name": "Power of attorney",
+      "icon": "prefer-not",
+      "note": "I don't trust anyone with that yet"
+    },
+    {
+      "name": "Executor of will",
+      "icon": "prefer-not",
+      "note": "basically only trust my brother for this"
+    },
+    {
+      "name": "Shared bank account(s)",
+      "icon": "off-limit",
+      "note": "Finances are touchy for me less we know abt one anothers finacnes the better. I dont like the power dynamic it introduces"
+    },
+    {
+      "name": "Mutual contributions to vacation / activity funds",
+      "icon": "maybe",
+      "note": "I dont have a job but if i did then yes. Maxim of shared activity is 'I am doing this. Would you like to join me?' "
+    },
+    {
+      "name": "Co-ownership of property",
+      "icon": "prefer-not",
+      "note": "We have seperate stuff that the other can use"
+    },
+    {
+      "name": "Giving financial support to each other",
+      "icon": "talk",
+      "note": "Our situation is this already"
+    },
+    {
+      "name": "Large gifts",
+      "icon": "talk",
+      "note": "no idea what this entails"
+    },
+    {
+      "name": "Complete financial integration",
+      "icon": "off-limit",
+      "note": "Finances are very scary and touchy to me but big believer in financial independance"
+    },
+    {
+      "name": "Regularly scheduled time together",
+      "icon": "must",
+      "note": "Please"
+    },
+    {
+      "name": "In-person visits",
+      "icon": "must",
+      "note": "I like spending time with you"
+    },
+    {
+      "name": "Date nights / outings",
+      "icon": "like",
+      "note": "I like having new activities to do together"
+    },
+    {
+      "name": "Shared activities",
+      "icon": "like",
+      "note": "I like spending time with you"
+    },
+    {
+      "name": "Intellectual & philosophical discussions",
+      "icon": "must",
+      "note": "Your brain facinates me and you are one of the only people on earth who i can talk to and feel fully engaged the whole time and not like im slowing down"
+    },
+    {
+      "name": "Parallel play",
+      "icon": "must",
+      "note": "I like spending time with you even if we are doing different things"
+    },
+    {
+      "name": "Vacations or excursions together",
+      "icon": "like",
+      "note": "I like having new experiences and I like spending time with you"
+    },
+    {
+      "name": "Sharing an apartment or a home",
+      "icon": "must",
+      "note": "our situation necessitates this"
+    },
+    {
+      "name": "Having a key to each other's home",
+      "icon": "must",
+      "note": "our situation necessitates this"
+    },
+    {
+      "name": "Sharing a permanent sleeping space",
+      "icon": "must",
+      "note": "i like spending time with you and cuddling you"
+    },
+    {
+      "name": "Doing sleep overs",
+      "icon": "must",
+      "note": "i like spending time with you and cuddling you"
+    },
+    {
+      "name": "Cooking together",
+      "icon": "maybe",
+      "note": "I like spending time with you"
+    },
+    {
+      "name": "Sharing meals together",
+      "icon": "like",
+      "note": "I like spending time with you"
+    },
+    {
+      "name": "Cleaning up after each other",
+      "icon": "like",
+      "note": "i <3 intimacy and looking after you"
+    },
+    {
+      "name": "Chores & Routines",
+      "icon": "like",
+      "note": "i <3 intimacy and spending time with you"
+    },
+    {
+      "name": "Family (sick, elderly)",
+      "icon": "talk",
+      "note": "not sure what this entails"
+    },
+    {
+      "name": "Animals",
+      "icon": "off-limit",
+      "note": "I can barely look after myself"
+    },
+    {
+      "name": "Plants",
+      "icon": "like",
+      "note": "Lower stakes than cats but a routine could be good"
+    },
+    {
+      "name": "Children (own or from other partnerships)",
+      "icon": "off-limit",
+      "note": "no"
+    },
+    {
+      "name": "Long-term commitment (for the above)",
+      "icon": "off-limit",
+      "note": "no"
+    },
+    {
+      "name": "Active listening",
+      "icon": "must",
+      "note": "Your attention is important to me"
+    },
+    {
+      "name": "Expressing happiness and joy",
+      "icon": "must",
+      "note": "I <3 being sincere"
+    },
+    {
+      "name": "Expressing sadness or grief",
+      "icon": "must",
+      "note": "I want to help and be helped"
+    },
+    {
+      "name": "Expressing affection",
+      "icon": "must",
+      "note": "I <3 being sincere"
+    },
+    {
+      "name": "Expressing gratitude and appreciation",
+      "icon": "must",
+      "note": "I <3 being sincere and also this helps with brain worms"
+    },
+    {
+      "name": "Expressing disappointment or frustration",
+      "icon": "must",
+      "note": "Being honest is important i am working on being able to express it"
+    },
+    {
+      "name": "Sharing fears and insecurities",
+      "icon": "must",
+      "note": "I am trying to get better at articulating these"
+    },
+    {
+      "name": "Sharing dreams and aspirations",
+      "icon": "like",
+      "note": "I want to know whats inside your head"
+    },
+    {
+      "name": "Having difficult conversations",
+      "icon": "must",
+      "note": "I want to be open with you"
+    },
+    {
+      "name": "Sharing stories about the past",
+      "icon": "like",
+      "note": "I like knowing your brain but I am still working on being able to deal with a past of any kind"
+    },
+    {
+      "name": "Knowing personal likes & dislikes",
+      "icon": "like",
+      "note": "I want to know whats in your head"
+    },
+    {
+      "name": "Sharing about mental health challenges",
+      "icon": "like",
+      "note": "I want to know whats in your head"
+    },
+    {
+      "name": "Body contact",
+      "icon": "must",
+      "note": "Touch me. Please."
+    },
+    {
+      "name": "Hugging each other",
+      "icon": "must",
+      "note": "I <3 affection"
+    },
+    {
+      "name": "Giving each other massages",
+      "icon": "must",
+      "note": "Please."
+    },
+    {
+      "name": "Dancing together",
+      "icon": "like",
+      "note": "I love having fun"
+    },
+    {
+      "name": "Cuddling with each other",
+      "icon": "must",
+      "note": "Please."
+    },
+    {
+      "name": "Holding hands",
+      "icon": "like",
+      "note": "I <3 affection"
+    },
+    {
+      "name": "Kissing each other",
+      "icon": "must",
+      "note": "Your lips are soft and I like them"
+    },
+    {
+      "name": "Being naked around each other",
+      "icon": "like",
+      "note": "You are hot to look at"
+    },
+    {
+      "name": "Co-sleeping",
+      "icon": "like",
+      "note": "heheh cozy"
+    },
+    {
+      "name": "Public displays of affection",
+      "icon": "like",
+      "note": "I <3 affection"
+    },
+    {
+      "name": "Playing with each other's hair",
+      "icon": "like",
+      "note": "Your hair is soft and cute"
+    },
+    {
+      "name": "Back scratches",
+      "icon": "like",
+      "note": "Please"
+    },
+    {
+      "name": "Sitting close together",
+      "icon": "like",
+      "note": "Please"
+    },
+    {
+      "name": "Offering support in hard times",
+      "icon": "must",
+      "note": "I think important"
+    },
+    {
+      "name": "Being asked for advice",
+      "icon": "like",
+      "note": "I trust your judgement but I like being factored into your decision making"
+    },
+    {
+      "name": "Being a trusted confidant",
+      "icon": "like",
+      "note": "I want to be important to you"
+    },
+    {
+      "name": "Showing empathy and understanding",
+      "icon": "must",
+      "note": "Basis of our relationship"
+    },
+    {
+      "name": "Giving each other reassurances",
+      "icon": "must",
+      "note": "I am paranoid and insecure so i think i need"
+    },
+    {
+      "name": "Supporting mental health work",
+      "icon": "must",
+      "note": "I am paranoid and insecure"
+    },
+    {
+      "name": "Celebrating successes together",
+      "icon": "must",
+      "note": "We are two different people who "
+    },
+    {
+      "name": "Emotional attraction",
+      "icon": "must",
+      "note": "I like feeling things with you"
+    },
+    {
+      "name": "Expressing love and affection",
+      "icon": "must",
+      "note": "Please"
+    },
+    {
+      "name": "Unmotivated euphoria",
+      "icon": "like",
+      "note": ""
+    },
+    {
+      "name": "Intense focus",
+      "icon": "like",
+      "note": "not necessary"
+    },
+    {
+      "name": "Helping each other out with favors",
+      "icon": "like",
+      "note": "I want to make your life easier"
+    },
+    {
+      "name": "Emergency care and support",
+      "icon": "must",
+      "note": "Given our living situation"
+    },
+    {
+      "name": "Care in case of illness or injury",
+      "icon": "must",
+      "note": "given our living situation"
+    },
+    {
+      "name": "Age-related care",
+      "icon": "talk",
+      "note": "I have no idea what this would entail"
+    },
+    {
+      "name": "End-of-life care",
+      "icon": "talk",
+      "note": "I hope it doesn't come to this"
+    },
+    {
+      "name": "Disability support",
+      "icon": "must",
+      "note": "Given our living situation"
+    },
+    {
+      "name": "Recovery and rehabilitation support",
+      "icon": "must",
+      "note": "I think this is not gonna come up but given our living"
+    },
+    {
+      "name": "Mental health support",
+      "icon": "must",
+      "note": "I don't think I have to explain this one"
+    },
+    {
+      "name": "Caregiving boundaries and limits",
+      "icon": "talk",
+      "note": "I am not sure what this entails for either of us"
+    },
+    {
+      "name": "Meeting / spending time with friends",
+      "icon": "must",
+      "note": "I <3 friends. we both need to do this lowkey"
+    },
+    {
+      "name": "Meeting parents/siblings/extended family",
+      "icon": "must",
+      "note": "Given our living situation"
+    },
+    {
+      "name": "Meeting children (from other partnerships)",
+      "icon": "prefer-not",
+      "note": ""
+    },
+    {
+      "name": "Serving as +1 for social events",
+      "icon": "like",
+      "note": "I want to be around you"
+    },
+    {
+      "name": "Presenting as a couple in public settings",
+      "icon": "talk",
+      "note": "I want this I don't know if you do"
+    },
+    {
+      "name": "Presenting as a couple on social media",
+      "icon": "off-limit",
+      "note": "Social Media coupling is gross"
+    },
+    {
+      "name": "Presenting as a couple in professional settings",
+      "icon": "talk",
+      "note": "no idea what this means"
+    },
+    {
+      "name": "Joint vacations with family or friends",
+      "icon": "talk",
+      "note": "I would like this but idk if you would"
+    },
+    {
+      "name": "Talking about sex and sexuality",
+      "icon": "must",
+      "note": "We are fucking this is necessary"
+    },
+    {
+      "name": "Being sexual with each other",
+      "icon": "like",
+      "note": "its fun."
+    },
+    {
+      "name": "Mutual masturbation",
+      "icon": "like",
+      "note": "its fun"
+    },
+    {
+      "name": "Oral sex (cunnilingus & blowjobs)",
+      "icon": "like",
+      "note": ""
+    },
+    {
+      "name": "Manual sex (fingering & hand jobs)",
+      "icon": "like",
+      "note": ""
+    },
+    {
+      "name": "Penetrative vaginal sex",
+      "icon": "like",
+      "note": ""
+    },
+    {
+      "name": "Penetrative anal sex",
+      "icon": "like",
+      "note": ""
+    },
+    {
+      "name": "Using sex toys",
+      "icon": "like",
+      "note": "Please on me"
+    },
+    {
+      "name": "Role play and power dynamics",
+      "icon": "talk",
+      "note": "specifics need to be discussed"
+    },
+    {
+      "name": "Bondage and restraint",
+      "icon": "like",
+      "note": ""
+    },
+    {
+      "name": "Impact play (spanking, etc.)",
+      "icon": "like",
+      "note": "Please"
+    },
+    {
+      "name": "Sensory play (blindfolds, ice, feathers, etc.)",
+      "icon": "like",
+      "note": "Please"
+    },
+    {
+      "name": "Threesomes or group sex",
+      "icon": "like",
+      "note": ""
+    },
+    {
+      "name": "Importance of orgasms",
+      "icon": "must",
+      "note": "Its the achievement-get of the situation"
+    },
+    {
+      "name": "Favorite positions and preferences",
+      "icon": "must",
+      "note": "As many as possible in as succession"
+    },
+    {
+      "name": "How frequent is sex wanted",
+      "icon": "must",
+      "note": "near daily"
+    },
+    {
+      "name": "Giving and receiving sexual feedback",
+      "icon": "must",
+      "note": "I need to get better at this"
+    },
+    {
+      "name": "Safer sex practices and protection",
+      "icon": "must",
+      "note": "Closed loop + keeping informed etc"
+    },
+    {
+      "name": "STI testing and status",
+      "icon": "must",
+      "note": ""
+    },
+    {
+      "name": "Sexual boundaries and consent",
+      "icon": "must",
+      "note": "I need to know you want me still"
+    },
+    {
+      "name": "Alone time",
+      "icon": "must",
+      "note": "Mostly for school atm"
+    },
+    {
+      "name": "Balance of time together and apart",
+      "icon": "must",
+      "note": "I want a lot of quality time but I prioritise focused time together"
+    },
+    {
+      "name": "Support to pursue independent interests",
+      "icon": "must",
+      "note": ""
+    },
+    {
+      "name": "Maintaining independent friendships",
+      "icon": "must",
+      "note": ""
+    },
+    {
+      "name": "Being sexually exclusive with each other",
+      "icon": "talk",
+      "note": "I am not sure this is the best course of action"
+    },
+    {
+      "name": "Being romantically / emotionally exclusive",
+      "icon": "talk",
+      "note": ""
+    },
+    {
+      "name": "Equal distribution of relationship power",
+      "icon": "talk",
+      "note": ""
+    },
+    {
+      "name": "Independent decision making",
+      "icon": "must",
+      "note": ""
+    },
+    {
+      "name": "Relationship style preferences",
+      "icon": "talk",
+      "note": "Idk what this means"
+    },
+    {
+      "name": "Meeting metamors (other partners)",
+      "icon": "talk",
+      "note": "Torn between open communication & TLIKTB"
+    },
+    {
+      "name": "Having positive relationships with metamors",
+      "icon": "must",
+      "note": "I dont want to hate the other people"
+    },
+    {
+      "name": "Joint vacations with metamors",
+      "icon": "talk",
+      "note": "Need to discuss"
+    },
+    {
+      "name": "Prioritisation over other partners",
+      "icon": "like",
+      "note": "I need deeply to feel important and special and valued"
+    },
+    {
+      "name": "Sharing compersion and joy",
+      "icon": "like",
+      "note": ""
+    },
+    {
+      "name": "Dealing with jealousy",
+      "icon": "must",
+      "note": "Need to work on combination techniques"
+    },
+    {
+      "name": "Communication about other partners",
+      "icon": "must",
+      "note": ""
+    },
+    {
+      "name": "Relationship hierarchy",
+      "icon": "talk",
+      "note": ""
+    },
+    {
+      "name": "New partner protocols",
+      "icon": "talk",
+      "note": ""
+    },
+    {
+      "name": "Prioritisation over friendships",
+      "icon": "off-limit",
+      "note": "Your non-metamor relationships are NB"
+    },
+    {
+      "name": "Relationship labels",
+      "icon": "talk",
+      "note": ""
+    },
+    {
+      "name": "Planning for future",
+      "icon": "must",
+      "note": "Re:Living Situation"
+    },
+    {
+      "name": "Expectation of long term involvement",
+      "icon": "talk",
+      "note": "At Least Until I am Done Studying"
+    },
+    {
+      "name": "Commitment to working through challenges",
+      "icon": "must",
+      "note": ""
+    },
+    {
+      "name": "Commitment to relationship maintenance",
+      "icon": "must",
+      "note": ""
+    },
+    {
+      "name": "Pregnancy or adopting together",
+      "icon": "off-limit",
+      "note": "lol"
+    },
+    {
+      "name": "Marriage or civil partnership",
+      "icon": "off-limit",
+      "note": "lol"
+    },
+    {
+      "name": "Time and energy commitment",
+      "icon": "talk",
+      "note": "need to see after some time @ school"
+    },
+    {
+      "name": "Love languages",
+      "icon": "talk",
+      "note": ""
+    },
+    {
+      "name": "Accountability",
+      "icon": "must",
+      "note": ""
+    },
+    {
+      "name": "Privacy",
+      "icon": "must",
+      "note": ""
+    },
+    {
+      "name": "Mental health & trauma",
+      "icon": "must",
+      "note": ""
+    }
+  ]
+}
