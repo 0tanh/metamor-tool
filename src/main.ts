@@ -36,6 +36,9 @@ function kebabCase(s: string){
           .replaceAll(".","-")
           .replaceAll("(","-")
           .replaceAll(")","-")
+          .replaceAll("&", "and")
+          .replaceAll("'", "")
+          .replaceAll("+","plus")
 }
 
 // Function to download a text file from the browser
@@ -100,7 +103,6 @@ function makeIconButtonsWork(section: HTMLElement, ctx: PreferenceContext){
       const fullSelector = `#${nameKebab}${iconString}Button`
       
       const notesSubmitSelector = `#${nameKebab}NotesSubmit`
-      
 
       const handleSubmit = () => {
         ctx.currentPreferenceProfile.metamorPrefs[ctx.currentPrefNumber].note = notesText.value;
@@ -158,7 +160,7 @@ function handleBack(ctx: PreferenceContext){
  * @param ctx the scoped context
  */
 function handleForward(ctx: PreferenceContext){
-  ctx.currentPrefNumber = ctx.currentPrefNumber <= ctx.prefSize +1 ? ctx.currentPrefNumber + 1 : ctx.prefSize
+  ctx.currentPrefNumber = ctx.currentPrefNumber <= ctx.prefSize ? ctx.currentPrefNumber + 1 : ctx.currentPrefNumber
   render(ctx)
 }
 /**
@@ -256,18 +258,20 @@ function render(ctx: PreferenceContext){
   const app = document.querySelector<HTMLDivElement>('#app')!;
   
   app.innerHTML = 
-    `
-    <section id="preferenceSelection">
-      ${prefList[ctx.currentPrefNumber]}
-    </section>
-    <sub>${currentMatch}</sub>
+    `<section id='prefSelectionPanel'>
+      <h1>Build</h1>
+      <section id="preferenceSelection">
+        ${prefList[ctx.currentPrefNumber]}
+      </section>
+      <sub>${currentMatch}</sub>
 
-    ${notes == ''?'':`<br><sub>You added this comment: <br> <span> ${notes} </span> </sub>`}
-    
-    <br>
-    
-    <button id=downloadPrefs>Download your prefs</button>
-    <sub>${ctx.currentPrefNumber +1}/${ctx.prefSize}</sub>
+      ${notes == ''?'':`<br><sub>You added this comment: <br> <span> ${notes} </span> </sub>`}
+      
+      <br>
+      
+      <button id=downloadPrefs>Download your prefs</button>
+      <sub>${ctx.currentPrefNumber +1}/${ctx.prefSize}</sub>
+    </section>
     `;
 
   app.querySelectorAll<HTMLElement>(".preferenceCard").forEach((section)=>{
