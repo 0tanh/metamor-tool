@@ -37,9 +37,9 @@ for o in formatted:
     o.clear_note()
 
 emptied = {}
-emptied["name"] = ""
+emptied["metamorName"] = ""
 emptied["date"] = ""
-emptied["prefs"] = formatted
+emptied["metamorPrefs"] = formatted
 
 
 print(emptied)
