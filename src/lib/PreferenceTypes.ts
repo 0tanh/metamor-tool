@@ -3,11 +3,11 @@
  * 
  */
 export const PreferenceIcon = {
-  MUST:"MUST", 
-  LIKE: "LIKE", 
-  MAYBE: "MAYBE", 
-  PREFER_NOT: "PREFER_NOT", 
   OFF_LIMIT: "OFF_LIMIT", 
+  PREFER_NOT: "PREFER_NOT", 
+  MAYBE: "MAYBE", 
+  LIKE: "LIKE", 
+  MUST:"MUST", 
   //for for loops
   *[Symbol.iterator]() {
     for (const value of Object.keys(this)) {
