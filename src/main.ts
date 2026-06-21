@@ -1,4 +1,4 @@
-// import './style.css'
+import './style.css'
 import { PreferenceIcon } from './lib/PreferenceTypes';
 import type { Preference, PreferenceProfile, PreferenceContext, PreferenceIconType } from './lib/PreferenceTypes';
 const metamor_default_URL = "http://localhost:3000"
@@ -34,6 +34,8 @@ function kebabCase(s: string){
           .replaceAll("/","-")
           .replaceAll(",","-")
           .replaceAll(".","-")
+          .replaceAll("(","-")
+          .replaceAll(")","-")
 }
 
 // Function to download a text file from the browser
@@ -89,28 +91,40 @@ function makeIconButtonsWork(section: HTMLElement, ctx: PreferenceContext){
       
       const iconString = String(icon)
       const nameKebab = kebabCase(ctx.currentPref.name)
+      const notesSelector = `#${nameKebab}Notes`
+      let notesText = section.querySelector(notesSelector) as HTMLInputElement
       
       const fullSelector = `#${nameKebab}${iconString}Button`
       
-      const notesSelector = `#${nameKebab}Notes`
       const notesSubmitSelector = `#${nameKebab}NotesSubmit`
       
-      let notesText = section.querySelector(notesSelector) as HTMLInputElement
 
       const handleSubmit = () => {
         ctx.currentPreferenceProfile.metamorPrefs[ctx.currentPrefNumber].note = notesText.value;
         render(ctx)
       }
       
-      const handleIcon = () => {
-        // ctx.currentPreferenceProfile.metamorPrefs[ctx.currentPrefNumber].icon = PreferenceIcon.LIKE
+      const handleIconDynamic = () => {
         const chosenIconValue = PreferenceIcon[icon as keyof typeof PreferenceIcon];
-        ctx.currentPreferenceProfile.metamorPrefs[ctx.currentPrefNumber].icon = chosenIconValue;
-        render(ctx)
+        handleIcon(chosenIconValue, ctx)
       }      
-      section.querySelector(fullSelector)?.addEventListener("click", handleIcon)
+      section.querySelector(fullSelector)?.addEventListener("click", handleIconDynamic)
       section.querySelector(notesSubmitSelector)?.addEventListener("click", handleSubmit)
     })
+}
+
+function handleSubmit(notesValue: string, ctx: PreferenceContext){
+  ctx.currentPreferenceProfile.metamorPrefs[ctx.currentPrefNumber].note = notesValue;
+  render(ctx)
+}
+/**
+ * The Icon You have chosen is saved to the state
+ * @param chosenIcon The chosen icon
+ * @param ctx the current preference context
+ */
+function handleIcon(chosenIcon: PreferenceIconType, ctx: PreferenceContext){
+  ctx.currentPreferenceProfile.metamorPrefs[ctx.currentPrefNumber].icon = chosenIcon;
+  render(ctx)
 }
 
 /**
@@ -144,6 +158,15 @@ function handleForward(ctx: PreferenceContext){
   ctx.currentPrefNumber = ctx.currentPrefNumber <= ctx.prefSize +1 ? ctx.currentPrefNumber + 1 : ctx.prefSize
   render(ctx)
 }
+/**
+ * The current preference context for the option that the user is on is cleared
+ * @param ctx the scoped context
+ */
+function handleClear(ctx: PreferenceContext){
+  ctx.currentPreferenceProfile.metamorPrefs[ctx.currentPrefNumber].icon = null;
+  ctx.currentPreferenceProfile.metamorPrefs[ctx.currentPrefNumber].note = ""
+  render(ctx)
+}
 
 /**
  * Add callbacks to the buttons required for navigation
@@ -151,28 +174,13 @@ function handleForward(ctx: PreferenceContext){
  */
 function makeNavButtonsWork(section: HTMLElement, ctx: PreferenceContext){
   
-  const handleBack = () => {
-    ctx.currentPrefNumber =  ctx.currentPrefNumber <= 0 ? 0: ctx.currentPrefNumber - 1
-    render(ctx)
-  }
-  
-  const handleClear = () => {
-    const isNull = ctx.currentPreferenceProfile.metamorPrefs[ctx.currentPrefNumber]?.icon == null
-    ctx.currentPreferenceProfile.metamorPrefs[ctx.prefNumber].icon = null
-    console.log(`value of icon is ${isNull}`)
-    render(ctx)
-  }
 
-  const handleForward = () =>{
-    ctx.currentPrefNumber = ctx.currentPrefNumber <= ctx.prefSize +1 ? ctx.currentPrefNumber + 1 : ctx.prefSize
-    render(ctx)
-  }
 
-  section.querySelector(".prefClear")?.addEventListener("click", handleClear)  
+  section.querySelector(".prefClear")?.addEventListener("click", () => handleClear(ctx))  
   
-  section.querySelector(".prefBackNav")?.addEventListener("click", handleBack)  
+  section.querySelector(".prefBackNav")?.addEventListener("click", () => handleBack(ctx))  
   
-  section.querySelector(".prefForwardNav")?.addEventListener("click", handleForward)
+  section.querySelector(".prefForwardNav")?.addEventListener("click", () => handleForward(ctx))
 }
 
 /**
@@ -183,16 +191,41 @@ function globalShortcuts(ctx: PreferenceContext){
   document.addEventListener("keydown", function (e) {
     const event = e as KeyboardEvent
     switch (event.key){
-      case "ArrowDown": 
+      case "ArrowUp": 
       case "ArrowLeft": 
         handleBack(ctx)
         break
       
-      case "ArrowUp": 
+      case "ArrowDown": 
       case "ArrowRight": 
         handleForward(ctx)
         break
+      
+      case "Enter":
+        const nameKebab = kebabCase(ctx.currentPref.name)
+        const notesSelector = `#${nameKebab}Notes`
+        let notesText = document.querySelector(notesSelector) as HTMLInputElement
+        handleSubmit(notesText.value, ctx)
+        break
 
+      case "0":
+        handleClear(ctx)
+        break
+      case "1":
+        handleIcon(PreferenceIcon.OFF_LIMIT, ctx)
+        break 
+      case "2":
+        handleIcon(PreferenceIcon.PREFER_NOT, ctx)
+        break 
+      case "3":
+        handleIcon(PreferenceIcon.MAYBE, ctx)
+        break
+      case "4":
+        handleIcon(PreferenceIcon.LIKE, ctx)
+        break
+      case "5":
+        handleIcon(PreferenceIcon.MUST, ctx)
+        break
       default : console.log(event.key);
     }
   })    
@@ -206,13 +239,12 @@ function render(ctx: PreferenceContext){
   
   const prefs: Preference[] = ctx.currentPreferenceProfile.metamorPrefs;
   ctx.currentPref = prefs[ctx.currentPrefNumber]
-  //! TODO refactor this prefs variable. it is impure!
-
+  
   const prefList = prefs.map((p: Preference)=>{
     const nameKebab = p.name.replaceAll(" ", "-")
     return `
       <section class="preferenceCard" id="${nameKebab}Card">
-      <p>${p.name}</p>
+      <p id="plainTextPref">${p.name}</p>
       ${preferenceMeta(buttonData(p))}
       </section>
     `})
@@ -224,17 +256,17 @@ function render(ctx: PreferenceContext){
   
   app.innerHTML = 
     `
-    <h3>${ctx.currentPrefNumber +1}/${ctx.prefSize}</h3>
     <section id="preferenceSelection">
       ${prefList[ctx.currentPrefNumber]}
     </section>
     <sub>${currentMatch}</sub>
 
-    ${notes == ''?'':`<br><sub>${notes}</sub>`}
+    ${notes == ''?'':`<br><sub>You added this comment: <br> <span> ${notes} </span> </sub>`}
     
     <br>
     
     <button id=downloadPrefs>Download your prefs</button>
+    <sub>${ctx.currentPrefNumber +1}/${ctx.prefSize}</sub>
     `;
 
   app.querySelectorAll<HTMLElement>(".preferenceCard").forEach((section)=>{
