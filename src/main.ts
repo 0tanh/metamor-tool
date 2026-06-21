@@ -5,7 +5,6 @@ const metamor_default_URL = "http://localhost:3000"
 
 const defaultMetamor = await fetch(metamor_default_URL)
 const data = await defaultMetamor.json();
-const prefs = data.prefs
 
 /**
  * Initially loaded context for selecting a preference
@@ -68,13 +67,14 @@ function buttonData(pref: Preference){
       </button>
     `}
     ).join("");
-
+  const kebabName =  kebabCase(pref.name)
   const onePrefInputs  = 
   `
   <section class="preferenceInputs">
     ${prefButtonsFunctional}
     <br>
-    <input type='text' id="${kebabCase(pref.name)}Notes" placeholder="Optional Notes"/>
+    <input type='text' name="${kebabName}Notes" id="${kebabName}Notes" placeholder="Optional Notes"/>
+    <button id=${kebabName}NotesSubmit class="">Submit</button>
   </section>
   `;
   return onePrefInputs
@@ -86,16 +86,30 @@ function buttonData(pref: Preference){
  */
 function makeIconButtonsWork(section: HTMLElement, ctx: PreferenceContext){
     Object.keys(PreferenceIcon).forEach((icon)=>{
+      
       const iconString = String(icon)
       const nameKebab = kebabCase(ctx.currentPref.name)
+      
       const fullSelector = `#${nameKebab}${iconString}Button`
+      
+      const notesSelector = `#${nameKebab}Notes`
+      const notesSubmitSelector = `#${nameKebab}NotesSubmit`
+      
+      let notesText = section.querySelector(notesSelector) as HTMLInputElement
+
+      const handleSubmit = () => {
+        ctx.currentPreferenceProfile.metamorPrefs[ctx.currentPrefNumber].note = notesText.value;
+        render(ctx)
+      }
+      
       const handleIcon = () => {
         // ctx.currentPreferenceProfile.metamorPrefs[ctx.currentPrefNumber].icon = PreferenceIcon.LIKE
         const chosenIconValue = PreferenceIcon[icon as keyof typeof PreferenceIcon];
         ctx.currentPreferenceProfile.metamorPrefs[ctx.currentPrefNumber].icon = chosenIconValue;
         render(ctx)
       }      
-      section.querySelector(fullSelector)?.addEventListener("click", handleIcon)  
+      section.querySelector(fullSelector)?.addEventListener("click", handleIcon)
+      section.querySelector(notesSubmitSelector)?.addEventListener("click", handleSubmit)
     })
 }
 
@@ -112,6 +126,23 @@ function preferenceMeta(preferenceWithInputs:string){
   <button class="prefForwardNav"> Next </button>
   `;  
   return onePrefInputs
+}
+/**
+ * Takes in the current context and rerenders the context for the previous page
+ * @param ctx the scoped context
+ */
+function handleBack(ctx: PreferenceContext){
+  ctx.currentPrefNumber =  ctx.currentPrefNumber <= 0 ? 0: ctx.currentPrefNumber - 1
+  render(ctx)
+}
+
+/**
+ * Takes in the current context and rerenders the context for the next page
+ * @param ctx the scoped context
+ */
+function handleForward(ctx: PreferenceContext){
+  ctx.currentPrefNumber = ctx.currentPrefNumber <= ctx.prefSize +1 ? ctx.currentPrefNumber + 1 : ctx.prefSize
+  render(ctx)
 }
 
 /**
@@ -137,9 +168,34 @@ function makeNavButtonsWork(section: HTMLElement, ctx: PreferenceContext){
     render(ctx)
   }
 
-  section.querySelector(".prefBackNav")?.addEventListener("click", handleBack)  
   section.querySelector(".prefClear")?.addEventListener("click", handleClear)  
+  
+  section.querySelector(".prefBackNav")?.addEventListener("click", handleBack)  
+  
   section.querySelector(".prefForwardNav")?.addEventListener("click", handleForward)
+}
+
+/**
+ * This binds global shortcuts for interacting with this webbed site
+ * @param ctx the preference context of everything else
+ */
+function globalShortcuts(ctx: PreferenceContext){
+  document.addEventListener("keydown", function (e) {
+    const event = e as KeyboardEvent
+    switch (event.key){
+      case "ArrowDown": 
+      case "ArrowLeft": 
+        handleBack(ctx)
+        break
+      
+      case "ArrowUp": 
+      case "ArrowRight": 
+        handleForward(ctx)
+        break
+
+      default : console.log(event.key);
+    }
+  })    
 }
 
 /**
@@ -163,7 +219,7 @@ function render(ctx: PreferenceContext){
   
   const current: Preference = prefs[ctx.currentPrefNumber]
   const currentMatch = current.icon == null ?`You have not selected a preference for this yet` : `${current.name} has an icon of ${current.icon}`
-  
+  const notes = `${current.note}`
   const app = document.querySelector<HTMLDivElement>('#app')!;
   
   app.innerHTML = 
@@ -173,7 +229,11 @@ function render(ctx: PreferenceContext){
       ${prefList[ctx.currentPrefNumber]}
     </section>
     <sub>${currentMatch}</sub>
+
+    ${notes == ''?'':`<br><sub>${notes}</sub>`}
+    
     <br>
+    
     <button id=downloadPrefs>Download your prefs</button>
     `;
 
@@ -184,5 +244,5 @@ function render(ctx: PreferenceContext){
 
   app.querySelector('#downloadPrefs')?.addEventListener("click", () => downloadPrefs(ctx))
 }
-
+globalShortcuts(ctx)
 render(ctx)
