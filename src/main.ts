@@ -75,7 +75,10 @@ function buttonData(pref: Preference){
   <section class="preferenceInputs">
     ${prefButtonsFunctional}
     <br>
-    <input type='text' name="${kebabName}Notes" id="${kebabName}Notes" placeholder="Optional Notes"/>
+    <label> Optional personal notes on this preference <br>
+      <textarea name="${kebabName}Notes" id="${kebabName}Notes" placeholder="Optional Notes"></textarea>
+    </label>
+    <br>
     <button id=${kebabName}NotesSubmit class="">Submit</button>
   </section>
   `;
@@ -169,13 +172,11 @@ function handleClear(ctx: PreferenceContext){
 }
 
 /**
- * Add callbacks to the buttons required for navigation
+ * Add callbacks to the buttons required for navigation in the scope of the current interface
  * @param ctx current Preference context
  */
 function makeNavButtonsWork(section: HTMLElement, ctx: PreferenceContext){
   
-
-
   section.querySelector(".prefClear")?.addEventListener("click", () => handleClear(ctx))  
   
   section.querySelector(".prefBackNav")?.addEventListener("click", () => handleBack(ctx))  
