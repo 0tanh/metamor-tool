@@ -17,6 +17,7 @@ export const PreferenceIcon = {
 
 export type PreferenceIconType= typeof PreferenceIcon[keyof typeof PreferenceIcon];
 
+
 /** 
  * Interface for a single preference
  * @property {string} name - the name of the current preference
@@ -25,7 +26,7 @@ export type PreferenceIconType= typeof PreferenceIcon[keyof typeof PreferenceIco
  */
 export interface Preference {
     name:string;
-    icon:string|null;
+    icon:PreferenceIconType|null;
     note:string;
 }
 /**
@@ -39,11 +40,15 @@ export interface PreferenceCategory {
 /**
  * Interface for a full profile
  * @property {string} metamorName the name of a metamor
+ * @property {Preference[]} metamorPrefs an array of all preferences
+ * @property {string} date when this profile was made
+ * @property {PreferenceCategory[]} metamorPrefsByCategory metamorPreferences arranged by category for easier comparison
  */
 export interface PreferenceProfile {
     metamorName: string;
     date?: string;
     metamorPrefs: Preference[]
+    metamorPrefsByCategory?: PreferenceCategory[]
 }
 
 /**
