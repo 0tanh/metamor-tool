@@ -1,6 +1,5 @@
 /**
  * Non-type erased enum of different prefences!
- * 
  */
 export const PreferenceIcon = {
   OFF_LIMIT: "OFF_LIMIT", 
@@ -28,7 +27,13 @@ export interface Preference {
     name:string;
     icon:string|null;
     note:string;
-    category?:string;
+}
+/**
+ * Interface that stores a category of preferences.
+ */
+export interface PreferenceCategory {
+    categoryName: string;
+    associatedPrefs: Preference[]
 }
 
 /**
