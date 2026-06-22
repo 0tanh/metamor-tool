@@ -19,7 +19,11 @@ const ctx:ComparisonContext = {
     allComparisonUnits: [],
     config : config
 }
-
+/**
+ * Given the comparison context, render all comparison units
+ * @param ctx the current comparison context
+ * @returns the rendered string
+ */
 function render_full(ctx: ComparisonContext): string{
     const all_units = ctx.allComparisonUnits.map((unit)=>{
         const name = unit.prefName;
@@ -76,7 +80,12 @@ function reduceToNonNullPreferences(profile: PreferenceProfile){
     }
     return reduced_profile
 }
-
+/**
+ * Given the smallest Preference Profile, find all comparison units that are true across all provided profiles
+ * @param smallest take in the smallest preference profile from context
+ * @param cleanedCompare null cleaned Preference Profiles
+ * @returns mapped comparisons across all available preferences
+ */
 function findAllComparisonUnits(smallest: PreferenceProfile, cleanedCompare: PreferenceProfile[]): ComparisonUnit[]{
     const outputUnits: ComparisonUnit[] = []
     // Create comparsions based on the smallest comparison available
@@ -150,23 +159,34 @@ function compareProfilesToContext(toCompare: PreferenceProfile[], config: Compar
         return compCtx
     }
 }
-
-function handleAnalysis(uploadCtx: UploadContext, ctx: ComparisonContext){
-    const config = ctx.config
+/**
+ * Run the analysis based on the current upload and comparison contexts
+ * @param uploadCtx the current upload context
+ * @param comparisonCtx the current comparison context
+ */
+function handleAnalysis(uploadCtx: UploadContext, comparisonCtx: ComparisonContext){
+    const config = comparisonCtx.config
     const toCompare = uploadCtx.toCompare
     const newCtx = compareProfilesToContext(toCompare, config)
     renderAnalysis(newCtx)
 }
-
-function handleFileUpload(section: HTMLElement, target: HTMLInputElement, uploadCtx: UploadContext, ctx: ComparisonContext){
+/**
+ * Dynamically render File upload buttons
+ * @param section The current section being rendered
+ * @param uploadInput The file input button
+ * @param uploadCtx the current upload context
+ * @param comparisonCtx the current comparison context
+ * @returns 
+ */
+function handleFileUpload(section: HTMLElement, uploadInput: HTMLInputElement, uploadCtx: UploadContext, comparisonCtx: ComparisonContext){
     
     // Check if any files were selected
-    if (!target.files || target.files.length === 0) {
+    if (!uploadInput.files || uploadInput.files.length === 0) {
         return;
     }
 
     // 3. Extract basic file metadata
-    const file: File = target.files[0];
+    const file: File = uploadInput.files[0];
     console.log(`File Name: ${file.name}`);
     console.log(`File Size: ${file.size} bytes`);
     console.log(`File Type: ${file.type}`);
@@ -206,7 +226,7 @@ function handleFileUpload(section: HTMLElement, target: HTMLInputElement, upload
             section.insertAdjacentHTML('beforeend', uploadAnother)
             
             const newFieldContainer = section.querySelector<HTMLElement>(`#${dynamicId}`)!;
-            makeFileUploadWork(newFieldContainer, uploadCtx, ctx)
+            makeFileUploadWork(newFieldContainer, uploadCtx, comparisonCtx)
             
             const analyseButton =`
                 <button id='startComparisonButton'>Start Comparison</button>
@@ -215,7 +235,7 @@ function handleFileUpload(section: HTMLElement, target: HTMLInputElement, upload
             
             if (uploadCtx.currentMetamorNumber >= 2 && !buttonExists) {
                 section.insertAdjacentHTML('beforeend', analyseButton)
-                section.querySelector('#startComparisonButton')?.addEventListener('click', () => handleAnalysis(uploadCtx, ctx))
+                section.querySelector('#startComparisonButton')?.addEventListener('click', () => handleAnalysis(uploadCtx, comparisonCtx))
             }
         }
     };
@@ -237,8 +257,12 @@ function makeFileUploadWork(section: HTMLElement, uploadCtx: Object, ctx: Compar
             }
         );
 }
-
-function renderUpload(uploadCtx: Object, ctx: ComparisonContext){
+/**
+ * Given the current upload & comparison context
+ * @param uploadCtx The current upload context
+ * @param comparisonCtx the current comparison context
+ */
+function renderUpload(uploadCtx: Object, comparisonCtx: ComparisonContext){
     const app = document.querySelector<HTMLDivElement>('#comparePrefs')!;
     const uploadCopy = `
     <label class='prefsUploadLabel'> Upload a metamor's preferences <br>
@@ -255,10 +279,13 @@ function renderUpload(uploadCtx: Object, ctx: ComparisonContext){
         `
     app.querySelectorAll(".allUploads").forEach((sec)=>{
         const section = sec as HTMLElement
-        makeFileUploadWork(section, uploadCtx, ctx)
+        makeFileUploadWork(section, uploadCtx, comparisonCtx)
     })
 }
-
+/**
+ * Given the current Comparison Context, Render an analysis
+ * @param ctx the comparison context being taken in to render
+ */
 function renderAnalysis(ctx: ComparisonContext){
     const { 
       max_acceptable_misalign,
