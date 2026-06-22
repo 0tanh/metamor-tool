@@ -17,9 +17,9 @@ let ctx: PreferenceContext = {
   currentPreferenceProfile: {
     metamorName: "foobar",
     metamorPrefs: data.prefs.map((p: Preference)=>{
-      const thisIcon = p.icon == "" ? null : p.icon
+      const thisIcon = p.iconValue == "" ? null : p.iconValue
       const category = p.category == null ? "": p.category
-      const asPref: Preference = {name: p.name , icon: thisIcon, note: p.note, category};
+      const asPref: Preference = {name: p.name , iconValue: thisIcon, note: p.note, category};
       return asPref
     })
   }
@@ -128,7 +128,7 @@ function handleSubmit(notesValue: string, ctx: PreferenceContext){
  * @param ctx the current preference context
  */
 function handleIcon(chosenIcon: PreferenceIconType, ctx: PreferenceContext){
-  ctx.currentPreferenceProfile.metamorPrefs[ctx.currentPrefNumber].icon = chosenIcon;
+  ctx.currentPreferenceProfile.metamorPrefs[ctx.currentPrefNumber].iconValue = chosenIcon;
   render(ctx)
 }
 
@@ -168,7 +168,7 @@ function handleForward(ctx: PreferenceContext){
  * @param ctx the scoped context
  */
 function handleClear(ctx: PreferenceContext){
-  ctx.currentPreferenceProfile.metamorPrefs[ctx.currentPrefNumber].icon = null;
+  ctx.currentPreferenceProfile.metamorPrefs[ctx.currentPrefNumber].iconValue = null;
   ctx.currentPreferenceProfile.metamorPrefs[ctx.currentPrefNumber].note = ""
   render(ctx)
 }
@@ -253,7 +253,7 @@ function render(ctx: PreferenceContext){
     `})
   
   const current: Preference = prefs[ctx.currentPrefNumber]
-  const currentMatch = current.icon == null ?`You have not selected a preference for this yet` : `${current.name} has an icon of ${current.icon}`
+  const currentMatch = current.iconValue == null ?`You have not selected a preference for this yet` : `${current.name} has an icon of ${Object.keys(PreferenceIcon)[current.iconValue-1]}`
   const notes = `${current.note}`
   const app = document.querySelector<HTMLDivElement>('#app')!;
   
