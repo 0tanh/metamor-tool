@@ -29,7 +29,7 @@ export type PreferenceIconType= typeof PreferenceIcon[keyof typeof PreferenceIco
  */
 export interface Preference {
     name:string;
-    icon:PreferenceIconType|null;
+    iconValue:PreferenceIconType|null;
     note:string;
 }
 /**
@@ -97,7 +97,7 @@ export type NotesConfigType= typeof NotesConfig [keyof typeof NotesConfig];
  */
 export interface ComparisonConfig {
   max_acceptable_misalign : number //maximum number of icon points off that two icons are allowed to be
-  show_full : boolean
+  show_full : boolean //show all preferences compared
   notes_config : NotesConfigType 
   show_perfect_matches : boolean //show preferences that have perfectly matched icons
   show_pain_points: boolean //show preferences that are diametrically opposed
@@ -127,4 +127,13 @@ export interface ComparisonContext {
     metamorName: string,
     unmatchedPref: Preference
   }[]
+  config: ComparisonConfig
+}
+
+/**
+ * This interface captures everything that is required for the upload file context
+ */
+ export interface UploadContext {
+  currentMetamorNumber: number
+  toCompare: PreferenceProfile[]
 }
