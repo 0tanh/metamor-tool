@@ -18,8 +18,7 @@ let ctx: PreferenceContext = {
     metamorName: "foobar",
     metamorPrefs: data.prefs.map((p: Preference)=>{
       const thisIcon = p.iconValue == "" ? null : p.iconValue
-      const category = p.category == null ? "": p.category
-      const asPref: Preference = {name: p.name , iconValue: thisIcon, note: p.note, category};
+      const asPref: Preference = {name: p.name , iconValue: thisIcon, note: p.note};
       return asPref
     })
   }
