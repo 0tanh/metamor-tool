@@ -1,24 +1,64 @@
-import { type PreferenceProfile, type ComparisonConfig, type NotesConfigType, NotesConfig, type ComparisonUnit, type ComparisonContext, type MetamorIconMap, type Preference } from '../lib/PreferenceTypes'
+import { type PreferenceProfile, type ComparisonConfig, type NotesConfigType, NotesConfig, type ComparisonUnit, type ComparisonContext, type MetamorIconMap, type Preference, type UploadContext } from '../lib/PreferenceTypes'
 
-let ctx = {
+const metamorNumber = 2;
 
+const uploadCtx = {
+    currentMetamorNumber : 0,
+    toCompare : []
 }
 
 const config:ComparisonConfig = {
     max_acceptable_misalign : 2, 
     show_full: true,
     notes_config : NotesConfig.ALL_NOTES,
-    show_pain_points : true, //These are points that are diametrically opposed
-    show_perfect_matches : true, //These match perfectly
-    show_uncomparable : true
+    show_pain_points : false, //These are points that are diametrically opposed
+    show_perfect_matches : false, //These match perfectly
+    show_uncomparable : false
+}
+const ctx:ComparisonContext = {
+    allComparisonUnits: [],
+    config : config
 }
 
-function show_notes(notesConfig: NotesConfigType){
+function render_full(ctx: ComparisonContext): string{
+    const all_units = ctx.allComparisonUnits.map((unit)=>{
+        const name = unit.prefName;
+        const metamorIconMap = unit.metamorIconMap
+        const singleUnitOut = `
+        <h3 id="${name}ComparisonUnitPref" class="comparisonUnit">${name}<h3>
+        <section id="${name}ComparisonMetamorMap>
 
+        </section>
+        `
+        return singleUnitOut
+    }).join("")
+    
+    const output =  `
+    <h2 class='comparisonSection'>Full Breakdown</h2>
+    ${all_units
+    }
+    `
+    return output
 }
 
-function show_pain_points(){
+function renderMisalign(max_acceptable_misalign: number, ctx: ComparisonContext){
+    return `<h2 class='comparisonSection'> Misalignment Breakdown</h2>`
+}
 
+function render_notes(notesConfig: NotesConfigType, ctx: ComparisonContext){
+    return `<h2 class='comparisonSection' >Notes</h2>`
+}
+
+function render_pain_points(ctx: ComparisonContext){
+    return `<h2 class='comparisonSection'> pain_points </h2>`
+}
+
+function render_perfect_matches(ctx: ComparisonContext){
+    return `<h2 class='comparisonSection'>perfect matches</h2>`
+}
+
+function render_uncomparable(all_uncomparable_perfs: {metamorName :string, unmatchedPref: Preference }[], ctx: ComparisonContext){
+    return `<h2 class='comparisonSection'>all uncomparable </h2>`
 }
 /**
  * Takes in a preference profile and returns a smaller preference profile with only 
@@ -31,13 +71,14 @@ function reduceToNonNullPreferences(profile: PreferenceProfile){
         metamorName : profile.metamorName,
         date : profile.date,
         metamorPrefs : profile.metamorPrefs.filter((pref)=>{
-            return pref.icon != null
+            return pref.iconValue != null
         })
     }
     return reduced_profile
 }
 
 function findAllComparisonUnits(smallest: PreferenceProfile, cleanedCompare: PreferenceProfile[]): ComparisonUnit[]{
+    const outputUnits: ComparisonUnit[] = []
     // Create comparsions based on the smallest comparison available
     for (const pSmall of smallest?.metamorPrefs){
         const currentPrefName = pSmall.name;
@@ -46,15 +87,16 @@ function findAllComparisonUnits(smallest: PreferenceProfile, cleanedCompare: Pre
             return profile.metamorPrefs.some((p)=>p.name == currentPrefName)
         })
     
-        //if not, exits early 
+        //if not, coninutes early 
         if (!available_in_all_profiles){
             continue
         }
     
         const firstIconMap: MetamorIconMap = {
             metamorName: smallest.metamorName,
-            icon: pSmall.icon
+            icon: pSmall.iconValue
         }
+
         let currentPref: ComparisonUnit = {
             prefName : currentPrefName,
             metamorIconMap : [firstIconMap]
@@ -69,14 +111,15 @@ function findAllComparisonUnits(smallest: PreferenceProfile, cleanedCompare: Pre
             
             const thisMap: MetamorIconMap = {
                 metamorName : profile.metamorName,
-                icon : found?.icon
+                icon : found?.iconValue
             }
             currentPref.metamorIconMap.push(thisMap)
             
         }
+        outputUnits.push(currentPref)
     
     }
-    return []
+    return outputUnits
 
 }
 
@@ -86,7 +129,7 @@ function findAllComparisonUnits(smallest: PreferenceProfile, cleanedCompare: Pre
  * @param config the configuration of the comparion
  * @returns 
  */
-function compareProfiles(toCompare: PreferenceProfile[], config: ComparisonConfig){
+function compareProfilesToContext(toCompare: PreferenceProfile[], config: ComparisonConfig): ComparisonContext{
     if (toCompare.length < 2){
         throw new Error("You need more than one profile to create a comparison")
     } else {
@@ -100,17 +143,22 @@ function compareProfiles(toCompare: PreferenceProfile[], config: ComparisonConfi
         }
         const concrete_smallest = smallest == undefined ? {} : smallest
         const compCtx:ComparisonContext = {
-            allComparisonUnits: findAllComparisonUnits(concrete_smallest, cleanedCompare)
+            allComparisonUnits: findAllComparisonUnits(concrete_smallest, cleanedCompare),
+            config : config
         } 
 
-        return 0
+        return compCtx
     }
-
-
 }
 
-function handleFileUpload(section: HTMLElement, target: HTMLInputElement, ctx: Object){
-    // const outputDiv = section.querySelector<HTMLDivElement>('output');
+function handleAnalysis(uploadCtx: UploadContext, ctx: ComparisonContext){
+    const config = ctx.config
+    const toCompare = uploadCtx.toCompare
+    const newCtx = compareProfilesToContext(toCompare, config)
+    renderAnalysis(newCtx)
+}
+
+function handleFileUpload(section: HTMLElement, target: HTMLInputElement, uploadCtx: UploadContext, ctx: ComparisonContext){
     
     // Check if any files were selected
     if (!target.files || target.files.length === 0) {
@@ -133,8 +181,42 @@ function handleFileUpload(section: HTMLElement, target: HTMLInputElement, ctx: O
         const result = e.target?.result;
         if (typeof result === 'string') {
             const jsonData = JSON.parse(result);
+            
             console.log(jsonData)
-
+            const nextProfile: PreferenceProfile = jsonData
+            
+            if (nextProfile != undefined) {
+                uploadCtx.currentMetamorNumber ++
+                uploadCtx.toCompare.push(nextProfile)
+            }
+            
+            const nextMetamorName = `<p>${nextProfile.metamorName}'s Preference Profile</p>`
+                section.insertAdjacentHTML('beforebegin', nextMetamorName)
+            
+            const dynamicId = `upload-wrapper-${uploadCtx.currentMetamorNumber}`;
+            
+            const uploadAnother= `
+            <br>
+            <div id= ${dynamicId}>
+            <label class='prefsUploadLabel'> Upload another metamor's preferences <br>
+                <input type="file" class="prefsUpload"/>
+            </label>
+            </div>
+            ` 
+            section.insertAdjacentHTML('beforeend', uploadAnother)
+            
+            const newFieldContainer = section.querySelector<HTMLElement>(`#${dynamicId}`)!;
+            makeFileUploadWork(newFieldContainer, uploadCtx, ctx)
+            
+            const analyseButton =`
+                <button id='startComparisonButton'>Start Comparison</button>
+            `
+            const buttonExists = section.querySelector('#startComparisonButton') !== null;
+            
+            if (uploadCtx.currentMetamorNumber >= 2 && !buttonExists) {
+                section.insertAdjacentHTML('beforeend', analyseButton)
+                section.querySelector('#startComparisonButton')?.addEventListener('click', () => handleAnalysis(uploadCtx, ctx))
+            }
         }
     };
 }
@@ -144,35 +226,64 @@ function handleFileUpload(section: HTMLElement, target: HTMLInputElement, ctx: O
  * @param section the scope in which the file upload will have listeners added
  * @param ctx current context
  */
-function makeFileUploadWork(section: HTMLElement, ctx: Object){
+function makeFileUploadWork(section: HTMLElement, uploadCtx: Object, ctx: ComparisonContext){
     const fileInput = section.querySelectorAll('.prefsUpload');
 
     // 2. Listen for the file selection event
     fileInput.forEach(
         (e)=>{e.addEventListener('change', (event: Event) => {
             const target = event.target as HTMLInputElement;
-            handleFileUpload(section, target, ctx)
-    })});
+            handleFileUpload(section, target, uploadCtx, ctx)})
+            }
+        );
 }
 
-function renderAnalysis(ctx: Object){
-  const app = document.querySelector<HTMLDivElement>('#comparePrefs')!;
-  app.innerHTML = `
-  <section id='prefComparisonPanel'>
-    <h1>Compare</h1>
-    <section class="allUploads"> 
-        <label> Upload a metamor's preferences <br>
-            <input type="file" class="prefsUpload"/>
-        </label>
-    </section> 
-  </section>
-  `
-  app.querySelectorAll(".allUploads").forEach((sec)=>{
-    const section = sec as HTMLElement
-    makeFileUploadWork(section, ctx)
-  })
-
+function renderUpload(uploadCtx: Object, ctx: ComparisonContext){
+    const app = document.querySelector<HTMLDivElement>('#comparePrefs')!;
+    const uploadCopy = `
+    <label class='prefsUploadLabel'> Upload a metamor's preferences <br>
+        <input type="file" class="prefsUpload"/>
+    </label>
+    ` 
+    app.innerHTML = `
+        <section id='prefComparisonPanel'>
+           <h1>Compare</h1>
+        <section class="allUploads"> 
+            ${uploadCopy}
+        </section>
+        <section id="prefsAnalysis"></section>
+        `
+    app.querySelectorAll(".allUploads").forEach((sec)=>{
+        const section = sec as HTMLElement
+        makeFileUploadWork(section, uploadCtx, ctx)
+    })
 }
 
-renderAnalysis(ctx)
+function renderAnalysis(ctx: ComparisonContext){
+    const { 
+      max_acceptable_misalign,
+      show_pain_points,
+      show_full,
+      notes_config,
+      show_perfect_matches,
+      show_uncomparable, 
+    } = ctx.config
+    
+    const all_uncomparable_prefs = ctx.all_uncomparable_prefs
+    
+    const app = document.querySelector<HTMLDivElement>('#prefsAnalysis')!;
+    
+    app.innerHTML = `
+        <section id="allComparisonSections">
+        ${ renderMisalign(max_acceptable_misalign, ctx)}
+        ${ show_pain_points ? render_pain_points(ctx) : '' }
+        ${ show_perfect_matches ? render_perfect_matches(ctx) : ''}
+        ${ render_notes(notes_config, ctx) }
+        ${ show_uncomparable ? render_uncomparable(all_uncomparable_prefs, ctx) : ''}
+        ${ show_full ? render_full(ctx): ''}
+        </section>
+    `
+}
+
+renderUpload(uploadCtx, ctx)
 
