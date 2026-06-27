@@ -1,6 +1,4 @@
-import { type PreferenceProfile, type ComparisonConfig, type NotesConfigType, NotesConfig, type ComparisonUnit, type ComparisonContext, type MetamorIconMap, type Preference, type UploadContext } from '../lib/PreferenceTypes'
-
-const metamorNumber = 2;
+import { type PreferenceProfile, type ComparisonConfig, type NotesConfigType, NotesConfig, type ComparisonUnit, type ComparisonContext, type MetamorIconMap, type Preference, type UploadContext, PreferenceIcon } from '../lib/PreferenceTypes'
 
 const uploadCtx = {
     currentMetamorNumber : 0,
@@ -27,11 +25,20 @@ const ctx:ComparisonContext = {
 function render_full(ctx: ComparisonContext): string{
     const all_units = ctx.allComparisonUnits.map((unit)=>{
         const name = unit.prefName;
+        console.log(unit)
         const metamorIconMap = unit.metamorIconMap
         const singleUnitOut = `
-        <h3 id="${name}ComparisonUnitPref" class="comparisonUnit">${name}<h3>
-        <section id="${name}ComparisonMetamorMap>
-
+        <h3 id="${name}ComparisonUnitPref" class="comparisonUnit">${name}</h3>
+        <section id="${name}ComparisonMetamorMap">
+            ${metamorIconMap.map(
+                (map)=>{
+                    return `
+                    <p>
+                    ${map.metamorName} => ${Object.keys(PreferenceIcon)[map.icon-1]}
+                    </p>
+                    `}
+                ).join('')
+            }
         </section>
         `
         return singleUnitOut
@@ -46,23 +53,57 @@ function render_full(ctx: ComparisonContext): string{
 }
 
 function renderMisalign(max_acceptable_misalign: number, ctx: ComparisonContext){
-    return `<h2 class='comparisonSection'> Misalignment Breakdown</h2>`
+    const misAlign = ctx.allComparisonUnits.filter((v)=>{
+        const minimum = Math.min(...v.metamorIconMap.map((m)=>m.icon.valueOf()))
+        const max = Math.max(...v.metamorIconMap.map((m)=>m.icon.valueOf()))
+        const diff = max - minimum;
+        return diff >= max_acceptable_misalign
+    }).map((compU)=>{
+        const formattedMap =`
+            ${compU.metamorIconMap.map((cu)=>{
+                const wordForIcon = Object.keys(PreferenceIcon)[cu.icon.valueOf() -1] 
+                const metaIcon = `
+                    <p> ${cu.metamorName} => ${wordForIcon}</p>
+                    
+                    `
+                return metaIcon
+            }).join('')
+            }
+        `
+        
+        const formatted =`
+            <h3>${compU.prefName}</h3>
+            <p>${formattedMap}</p>
+        `
+        return formatted
+    }).join('')
+    
+    const output = `
+    <h2 class='comparisonSection'> Misalignment Breakdown</h2>
+    <p>${misAlign}</p>
+    
+    `
+    return output
 }
 
 function render_notes(notesConfig: NotesConfigType, ctx: ComparisonContext){
-    return `<h2 class='comparisonSection' >Notes</h2>`
+    const output = `<h2 class='comparisonSection' >Notes</h2>`
+    return output
 }
 
 function render_pain_points(ctx: ComparisonContext){
-    return `<h2 class='comparisonSection'> pain_points </h2>`
+    const output=  `<h2 class='comparisonSection'> pain_points </h2>`
+    return output
 }
 
 function render_perfect_matches(ctx: ComparisonContext){
-    return `<h2 class='comparisonSection'>perfect matches</h2>`
+    const output = `<h2 class='comparisonSection'>perfect matches</h2>`
+    return output
 }
 
 function render_uncomparable(all_uncomparable_perfs: {metamorName :string, unmatchedPref: Preference }[], ctx: ComparisonContext){
-    return `<h2 class='comparisonSection'>all uncomparable </h2>`
+    const output = `<h2 class='comparisonSection'>all uncomparable </h2>`
+    return output
 }
 /**
  * Takes in a preference profile and returns a smaller preference profile with only 
@@ -111,7 +152,11 @@ function findAllComparisonUnits(smallest: PreferenceProfile, cleanedCompare: Pre
             metamorIconMap : [firstIconMap]
         }
         for (const profile of cleanedCompare){
-            const found = profile.metamorPrefs.find((p)=>{p.name == currentPrefName})
+            if (profile.metamorName === smallest.metamorName){
+                continue
+            }
+
+            const found = profile.metamorPrefs.find((p)=>p.name == currentPrefName)
             
             if (found == undefined) {
                 console.error(`filtering was imperfect. ${profile.metamorName}'s profile did not contain ${currentPrefName}`)
@@ -217,7 +262,7 @@ function handleFileUpload(section: HTMLElement, uploadInput: HTMLInputElement, u
             
             const uploadAnother= `
             <br>
-            <div id= ${dynamicId}>
+            <div id= "${dynamicId}">
             <label class='prefsUploadLabel'> Upload another metamor's preferences <br>
                 <input type="file" class="prefsUpload"/>
             </label>
@@ -231,7 +276,7 @@ function handleFileUpload(section: HTMLElement, uploadInput: HTMLInputElement, u
             const analyseButton =`
                 <button id='startComparisonButton'>Start Comparison</button>
             `
-            const buttonExists = section.querySelector('#startComparisonButton') !== null;
+            const buttonExists = document.querySelector('#startComparisonButton') !== null;
             
             if (uploadCtx.currentMetamorNumber >= 2 && !buttonExists) {
                 section.insertAdjacentHTML('beforeend', analyseButton)

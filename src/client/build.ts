@@ -15,7 +15,7 @@ let ctx: PreferenceContext = {
   currentPrefIcon: null,
   prefSize: data.prefs.length,
   currentPreferenceProfile: {
-    metamorName: "foobar",
+    metamorName: "",
     metamorPrefs: data.prefs.map((p: Preference)=>{
       const thisIcon = p.iconValue == "" ? null : p.iconValue
       const asPref: Preference = {name: p.name , iconValue: thisIcon, note: p.note};
@@ -233,6 +233,35 @@ function globalShortcuts(ctx: PreferenceContext){
   })    
 }
 
+function configRender(ctx: PreferenceContext): string{
+  const output = ` 
+      <section id='config'>
+        <h1>Config</h1>
+        <label> Whats your name? <br>
+        <input type='text' id='nameInput'></input>
+        <button id='submitName' type='button'>Submit Name</button>
+      </label>
+    `
+    return output
+}
+
+function handleName(section: HTMLElement, ctx: PreferenceContext){
+  const input = section.querySelector('#nameInput') as HTMLInputElement
+  ctx.currentPreferenceProfile.metamorName = input.value
+  render(ctx)
+}
+
+function makeConfigWork(section: HTMLElement, ctx: PreferenceContext){
+  section.querySelector("#submitName")?.addEventListener("click", () => handleName(section, ctx))
+  
+  section.querySelector("#submitName")?.addEventListener('keydown', (event: KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // Prevent default browser actions if needed
+      handleName(section, ctx);
+    }
+  });
+}
+
 /**
  * Takes in the current context of a preferenceSelection and loads it in
  * @param ctx the context in which the selection is being loaded in
@@ -256,9 +285,11 @@ function render(ctx: PreferenceContext){
   const notes = `${current.note}`
   const app = document.querySelector<HTMLDivElement>('#app')!;
   
-  app.innerHTML = 
-    `<section id='prefSelectionPanel'>
+  app.innerHTML = `
+      ${configRender(ctx)}
+      <section id='prefSelectionPanel'>
       <h1>Build</h1>
+      ${ctx.currentPreferenceProfile.metamorName == '' ? '' :"<h2>"+ctx.currentPreferenceProfile.metamorName+"'s preference Profile: </h2>"}
       <section id="preferenceSelection">
         ${prefList[ctx.currentPrefNumber]}
       </section>
@@ -277,7 +308,7 @@ function render(ctx: PreferenceContext){
     makeNavButtonsWork(section, ctx)
     makeIconButtonsWork(section, ctx)
   })
-
+  makeConfigWork(app, ctx)
   app.querySelector('#downloadPrefs')?.addEventListener("click", () => downloadPrefs(ctx))
 }
 globalShortcuts(ctx)
