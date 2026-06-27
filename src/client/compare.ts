@@ -7,9 +7,9 @@ const uploadCtx = {
 
 const config:ComparisonConfig = {
     max_acceptable_misalign : 2, 
-    show_full: true,
+    show_full: false,
     notes_config : NotesConfig.ALL_NOTES,
-    show_pain_points : false, //These are points that are diametrically opposed
+    show_pain_points : true, //These are points that are diametrically opposed
     show_perfect_matches : false, //These match perfectly
     show_uncomparable : false
 }
@@ -51,7 +51,12 @@ function render_full(ctx: ComparisonContext): string{
     `
     return output
 }
-
+/**
+ * Takes in the maximum acceptable misalignment and renders the misalignment
+ * @param max_acceptable_misalign the maximum amount of allowed misalignment
+ * @param ctx the Comparison Context
+ * @returns the html to render as a string
+ */
 function renderMisalign(max_acceptable_misalign: number, ctx: ComparisonContext){
     const misAlign = ctx.allComparisonUnits.filter((v)=>{
         const minimum = Math.min(...v.metamorIconMap.map((m)=>m.icon.valueOf()))
@@ -87,17 +92,71 @@ function renderMisalign(max_acceptable_misalign: number, ctx: ComparisonContext)
 }
 
 function render_notes(notesConfig: NotesConfigType, ctx: ComparisonContext){
-    const output = `<h2 class='comparisonSection' >Notes</h2>`
+    const output = `
+    <h2 class='comparisonSection' >Notes</h2>
+    `
     return output
 }
-
+/**
+ * Renders all the points where two people's beliefs are diametrically opposed
+ * @param ctx Comparison context
+ * @returns 
+ */
 function render_pain_points(ctx: ComparisonContext){
-    const output=  `<h2 class='comparisonSection'> pain_points </h2>`
+    const pain_point = ctx.allComparisonUnits.filter((compUnit)=>{
+        const mapList = compUnit.metamorIconMap
+        const min = mapList.filter((unit)=>{
+            const min = unit.icon.valueOf() == 1
+            return min
+        })
+        const max = mapList.filter((unit)=>{
+            const max = unit.icon.valueOf() == Object.keys(PreferenceIcon).length
+            return max
+        })
+        return min.length > 0 && max.length > 0
+    }).map((compUnit)=>{
+        const multiMetamor = `
+        <p> These metamors are diametrically opposed on this issue </p>
+            ${compUnit.metamorIconMap.map((p)=>{
+                const output = `<p>${p.metamorName}</p>`
+                return output
+            }).join('')} 
+
+        `
+        const output = `
+            <p>${compUnit.prefName}</p>
+            ${compUnit.metamorIconMap.length > 2 ? multiMetamor : ''}
+        `
+        return output
+    }).join('')
+    const output=  `
+        <h2 class='comparisonSection'> pain_points </h2>
+        ${pain_point}
+
+    `
     return output
 }
 
 function render_perfect_matches(ctx: ComparisonContext){
-    const output = `<h2 class='comparisonSection'>perfect matches</h2>`
+    const perfectMatches = ctx.allComparisonUnits
+        .filter((cu)=>{
+            const iconMapList = cu.metamorIconMap;
+            const first = cu.metamorIconMap[0]?.icon.valueOf()
+            const cleaned = iconMapList.filter((metamorMap)=> {return metamorMap.icon.valueOf() == first})
+            return cu.metamorIconMap.length == cleaned.length
+        })
+        .map((cu)=>{
+            const normalName = Object.keys(PreferenceIcon)[cu.metamorIconMap[0]?.icon.valueOf()]
+            const formatted =`
+                <p>${cu.prefName} => ${normalName}</p>
+            `
+            return formatted
+        })
+        .join('')
+    const output = `
+        <h2 class='comparisonSection'>perfect matches</h2>
+        <p>${perfectMatches}</p>
+        `
     return output
 }
 

@@ -266,7 +266,7 @@ function makeConfigWork(section: HTMLElement, ctx: PreferenceContext){
  * Takes in the current context of a preferenceSelection and loads it in
  * @param ctx the context in which the selection is being loaded in
  */
-function render(ctx: PreferenceContext){
+export function render(ctx: PreferenceContext){
   
   const prefs: Preference[] = ctx.currentPreferenceProfile.metamorPrefs;
   ctx.currentPref = prefs[ctx.currentPrefNumber]
