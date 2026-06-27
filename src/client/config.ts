@@ -1,35 +1,106 @@
-import type { ComparisonConfig, PreferenceContext } from "../lib/PreferenceTypes"
+import type { AllContext, ComparisonConfig, PreferenceContext } from "../lib/PreferenceTypes"
 import { render } from "./build"
 import { NotesConfig } from "../lib/PreferenceTypes"
 import type { NotesConfigType } from "../lib/PreferenceTypes"
 
-
-
-function configRender(compareCtx: ComparisonConfig, prefCtx: PreferenceContext): string{  
+/**
+ * 
+ * @param compareCtx Comparison context
+ * @param prefCtx Preference Context
+ * @returns the rendered config reader
+ */
+export function configRender(config: ComparisonConfig): string{   
+    
+    const notesButton = Object.keys(NotesConfig)
+    .map((icon)=>{
+      const iconString = String(icon);
+      const isActive = config.notes_config === NotesConfig[icon as keyof typeof NotesConfig];
+      const activeClass = isActive ? "NotesButton active" : "NotesButton";
+      
+      return `
+      <button 
+        class= ${activeClass}
+        id="${iconString}Button" 
+        class="NotesButton" 
+        >${iconString}
+      </button>
+    `}
+    ).join("");
+    
     const output = ` 
       <section id='config'>
         <h1>Config</h1>
         <label> Whats your name? <br>
-        <input type='text' id='nameInput'></input>
-        <button id='submitName' type='button'>Submit Name</button>
-      </label>
+            <input type='text' id='nameInput'></input>
+            <button id='submitName' type='button'>Submit Name</button>
+        </label>
+        <br>
+        <label>Show full breakdown? <input id='showFullBreakdown'type="checkbox" ${config.show_full ? 'checked': ''}></label>
+        <br>
+        <label>Show pain points? <input id='showPainPoints' type="checkbox"  ${config.show_pain_points ? 'checked': ''} ></label>
+        <br>
+        <label>Show perfect matches? <input id='showPerfectMatches' type="checkbox"  ${config.show_perfect_matches ? 'checked': ''}></label>
+        <br>
+        <label>Show uncomparable? <input id='showUncomparable'type="checkbox"  ${config.show_uncomparable ? 'checked': ''}></label>
+        <br>
+        <label>Select what kind of notes you would like to see <br>${notesButton}</label>
+      </section>
     `
     return output
 }
 
-function handleName(section: HTMLElement, ctx: PreferenceContext){
-  const input = section.querySelector('#nameInput') as HTMLInputElement
-  ctx.currentPreferenceProfile.metamorName = input.value
-  render(ctx)
+function handleFullBreakdown(section: HTMLElement, allCtx: AllContext){
+  const config = allCtx.comparisonContext.config
+  const input = section.querySelector('#showFullBreakdown') as HTMLInputElement
+  config.show_full = input.checked
+  render(allCtx)
 }
 
-function makeConfigWork(section: HTMLElement, ctx: PreferenceContext){
-  section.querySelector("#submitName")?.addEventListener("click", () => handleName(section, ctx))
+function handleShowPainPoints(section: HTMLElement, allCtx: AllContext){
+  const config = allCtx.comparisonContext.config
+  const input = section.querySelector('#showPainPoints') as HTMLInputElement
+  config.show_pain_points = input.checked
+  render(allCtx)
+}
+
+
+function handleShowPerfectMatches(section: HTMLElement, allCtx: AllContext){
+  const config = allCtx.comparisonContext.config
+  const input = section.querySelector('#showPerfectMatches') as HTMLInputElement
+  config.show_perfect_matches = input.checked
+  render(allCtx)
+}
+
+
+function handleShowUncomparable(section: HTMLElement, allCtx: AllContext){
+  const config = allCtx.comparisonContext.config
+  const input = section.querySelector('#showUncomparable') as HTMLInputElement
+  config.show_uncomparable = input.checked
+  render(allCtx)
+}
+
+function handleName(section: HTMLElement, allCtx: AllContext){
+  const ctx = allCtx.preferenceContext
+  const input = section.querySelector('#nameInput') as HTMLInputElement
+  ctx.currentPreferenceProfile.metamorName = input.value
+  render(allCtx)
+}
+/**
+ * Activate all the callbacks for configuration
+ * @param section takes in the section where the config lives and maps functionality to all buttons
+ * @param ctx the preference context
+ */
+export function makeConfigWork(section: HTMLElement, allCtx: AllContext){
+  section.querySelector("#submitName")?.addEventListener("click", () => handleName(section, allCtx))
+  section.querySelector("#showFullBreakdown")?.addEventListener("change", () => handleFullBreakdown(section, allCtx))
+  section.querySelector("#showPainPoints")?.addEventListener("change", () => handleShowPainPoints(section,  allCtx))
+  section.querySelector("#showPerfectMatches")?.addEventListener("change", () => handleShowPerfectMatches(section, allCtx))
+  section.querySelector("#showUncomparable")?.addEventListener("change", () => handleShowUncomparable(section, allCtx))
   
   section.querySelector("#submitName")?.addEventListener('keydown', (event: KeyboardEvent) => {
     if (event.key === 'Enter') {
       event.preventDefault(); // Prevent default browser actions if needed
-      handleName(section, ctx);
+      handleName(section, allCtx);
     }
   });
 }

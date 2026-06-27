@@ -1,6 +1,8 @@
 import '../style.css'
-import { PreferenceIcon } from '../lib/PreferenceTypes';
-import type { Preference, PreferenceProfile, PreferenceContext, PreferenceIconType } from '../lib/PreferenceTypes';
+import { NotesConfig, PreferenceIcon } from '../lib/PreferenceTypes';
+import type { Preference, PreferenceProfile, PreferenceContext, PreferenceIconType, ComparisonConfig, ComparisonContext, AllContext } from '../lib/PreferenceTypes';
+import { configRender, makeConfigWork } from './config';
+
 const metamor_default_URL = "http://localhost:3000"
 
 const defaultMetamor = await fetch(metamor_default_URL)
@@ -9,7 +11,7 @@ const data = await defaultMetamor.json();
 /**
  * Initially loaded context for selecting a preference
  */
-let ctx: PreferenceContext = {
+const prefCtx: PreferenceContext = {
   currentPrefNumber: 0,
   currentPref: data.prefs[0],
   currentPrefIcon: null,
@@ -23,6 +25,32 @@ let ctx: PreferenceContext = {
     })
   }
 }
+
+const uploadCtx = {
+    currentMetamorNumber : 0,
+    toCompare : []
+}
+
+const config:ComparisonConfig = {
+    max_acceptable_misalign : 2, 
+    show_full: false,
+    notes_config : NotesConfig.ALL_NOTES,
+    show_pain_points : true, //These are points that are diametrically opposed
+    show_perfect_matches : false, //These match perfectly
+    show_uncomparable : false
+}
+const comparisonCtx:ComparisonContext = {
+    allComparisonUnits: [],
+    config : config
+}
+
+export const allCtx: AllContext = {
+  preferenceContext : prefCtx,
+  comparisonContext : comparisonCtx, 
+  uploadContext : uploadCtx
+}
+
+
 /**
  * String is taken to kebab case
  * @param s string being kebab cased
@@ -91,9 +119,10 @@ function buttonData(pref: Preference){
  * Takes in the current context and adds mapping for all preferences to all buttons
  * @param ctx the current context being evaluated
  */
-function makeIconButtonsWork(section: HTMLElement, ctx: PreferenceContext){
-    Object.keys(PreferenceIcon).forEach((icon)=>{
-      
+function makeIconButtonsWork(section: HTMLElement, allctx: AllContext){
+  const ctx = allctx.preferenceContext
+  Object.keys(PreferenceIcon).forEach((icon)=>{
+       
       const iconString = String(icon)
       const nameKebab = kebabCase(ctx.currentPref.name)
       const notesSelector = `#${nameKebab}Notes`
@@ -105,30 +134,32 @@ function makeIconButtonsWork(section: HTMLElement, ctx: PreferenceContext){
 
       const handleSubmit = () => {
         ctx.currentPreferenceProfile.metamorPrefs[ctx.currentPrefNumber].note = notesText.value;
-        render(ctx)
+        render(allctx)
       }
       
       const handleIconDynamic = () => {
         const chosenIconValue = PreferenceIcon[icon as keyof typeof PreferenceIcon];
-        handleIcon(chosenIconValue, ctx)
+        handleIcon(chosenIconValue, allctx)
       }      
       section.querySelector(fullSelector)?.addEventListener("click", handleIconDynamic)
       section.querySelector(notesSubmitSelector)?.addEventListener("click", handleSubmit)
     })
 }
 
-function handleSubmit(notesValue: string, ctx: PreferenceContext){
+function handleSubmit(notesValue: string, allctx: AllContext){
+  const ctx = allctx.preferenceContext
   ctx.currentPreferenceProfile.metamorPrefs[ctx.currentPrefNumber].note = notesValue;
-  render(ctx)
+  render(allctx)
 }
 /**
  * The Icon You have chosen is saved to the state
  * @param chosenIcon The chosen icon
  * @param ctx the current preference context
  */
-function handleIcon(chosenIcon: PreferenceIconType, ctx: PreferenceContext){
+function handleIcon(chosenIcon: PreferenceIconType, allctx: AllContext){
+  const ctx = allctx.preferenceContext
   ctx.currentPreferenceProfile.metamorPrefs[ctx.currentPrefNumber].iconValue = chosenIcon;
-  render(ctx)
+  render(allctx)
 }
 
 /**
@@ -149,34 +180,37 @@ function preferenceMeta(preferenceWithInputs:string){
  * Takes in the current context and rerenders the context for the previous page
  * @param ctx the scoped context
  */
-function handleBack(ctx: PreferenceContext){
+function handleBack(allctx: AllContext){
+  const ctx = allctx.preferenceContext
   ctx.currentPrefNumber =  ctx.currentPrefNumber <= 0 ? 0: ctx.currentPrefNumber - 1
-  render(ctx)
+  render(allctx)
 }
 
 /**
  * Takes in the current context and rerenders the context for the next page
  * @param ctx the scoped context
  */
-function handleForward(ctx: PreferenceContext){
+function handleForward(allctx: AllContext){
+  const ctx = allctx.preferenceContext
   ctx.currentPrefNumber = ctx.currentPrefNumber <= ctx.prefSize ? ctx.currentPrefNumber + 1 : ctx.currentPrefNumber
-  render(ctx)
+  render(allctx)
 }
 /**
  * The current preference context for the option that the user is on is cleared
  * @param ctx the scoped context
  */
-function handleClear(ctx: PreferenceContext){
+function handleClear(allctx: AllContext){
+  const ctx = allctx.preferenceContext
   ctx.currentPreferenceProfile.metamorPrefs[ctx.currentPrefNumber].iconValue = null;
   ctx.currentPreferenceProfile.metamorPrefs[ctx.currentPrefNumber].note = ""
-  render(ctx)
+  render(allctx)
 }
 
 /**
  * Add callbacks to the buttons required for navigation in the scope of the current interface
  * @param ctx current Preference context
  */
-function makeNavButtonsWork(section: HTMLElement, ctx: PreferenceContext){
+function makeNavButtonsWork(section: HTMLElement, ctx: AllContext){
   
   section.querySelector(".prefClear")?.addEventListener("click", () => handleClear(ctx))  
   
@@ -189,7 +223,7 @@ function makeNavButtonsWork(section: HTMLElement, ctx: PreferenceContext){
  * This binds global shortcuts for interacting with this webbed site
  * @param ctx the preference context of everything else
  */
-function globalShortcuts(ctx: PreferenceContext){
+function globalShortcuts(ctx: AllContext){
   document.addEventListener("keydown", function (e) {
     const event = e as KeyboardEvent
     switch (event.key){
@@ -204,7 +238,7 @@ function globalShortcuts(ctx: PreferenceContext){
         break
       
       case "Enter":
-        const nameKebab = kebabCase(ctx.currentPref.name)
+        const nameKebab = kebabCase(ctx.preferenceContext.currentPref.name)
         const notesSelector = `#${nameKebab}Notes`
         let notesText = document.querySelector(notesSelector) as HTMLInputElement
         handleSubmit(notesText.value, ctx)
@@ -233,43 +267,17 @@ function globalShortcuts(ctx: PreferenceContext){
   })    
 }
 
-function configRender(ctx: PreferenceContext): string{
-  const output = ` 
-      <section id='config'>
-        <h1>Config</h1>
-        <label> Whats your name? <br>
-        <input type='text' id='nameInput'></input>
-        <button id='submitName' type='button'>Submit Name</button>
-      </label>
-    `
-    return output
-}
-
-function handleName(section: HTMLElement, ctx: PreferenceContext){
-  const input = section.querySelector('#nameInput') as HTMLInputElement
-  ctx.currentPreferenceProfile.metamorName = input.value
-  render(ctx)
-}
-
-function makeConfigWork(section: HTMLElement, ctx: PreferenceContext){
-  section.querySelector("#submitName")?.addEventListener("click", () => handleName(section, ctx))
-  
-  section.querySelector("#submitName")?.addEventListener('keydown', (event: KeyboardEvent) => {
-    if (event.key === 'Enter') {
-      event.preventDefault(); // Prevent default browser actions if needed
-      handleName(section, ctx);
-    }
-  });
-}
 
 /**
  * Takes in the current context of a preferenceSelection and loads it in
- * @param ctx the context in which the selection is being loaded in
+ * @param prefCtx the context in which the selection is being loaded in
  */
-export function render(ctx: PreferenceContext){
-  
-  const prefs: Preference[] = ctx.currentPreferenceProfile.metamorPrefs;
-  ctx.currentPref = prefs[ctx.currentPrefNumber]
+export function render(ctx: AllContext){
+  const prefCtx = ctx.preferenceContext;
+  const compCtx = ctx.comparisonContext;
+
+  const prefs: Preference[] = prefCtx.currentPreferenceProfile.metamorPrefs;
+  prefCtx.currentPref = prefs[prefCtx.currentPrefNumber]
   
   const prefList = prefs.map((p: Preference)=>{
     const nameKebab = p.name.replaceAll(" ", "-")
@@ -280,18 +288,18 @@ export function render(ctx: PreferenceContext){
       </section>
     `})
   
-  const current: Preference = prefs[ctx.currentPrefNumber]
+  const current: Preference = prefs[prefCtx.currentPrefNumber]
   const currentMatch = current.iconValue == null ?`You have not selected a preference for this yet` : `${current.name} has an icon of ${Object.keys(PreferenceIcon)[current.iconValue-1]}`
   const notes = `${current.note}`
   const app = document.querySelector<HTMLDivElement>('#app')!;
   
   app.innerHTML = `
-      ${configRender(ctx)}
+      ${configRender(compCtx.config, prefCtx)}
       <section id='prefSelectionPanel'>
       <h1>Build</h1>
-      ${ctx.currentPreferenceProfile.metamorName == '' ? '' :"<h2>"+ctx.currentPreferenceProfile.metamorName+"'s preference Profile: </h2>"}
+      ${prefCtx.currentPreferenceProfile.metamorName == '' ? '' :"<h2>"+prefCtx.currentPreferenceProfile.metamorName+"'s preference Profile: </h2>"}
       <section id="preferenceSelection">
-        ${prefList[ctx.currentPrefNumber]}
+        ${prefList[prefCtx.currentPrefNumber]}
       </section>
       <sub>${currentMatch}</sub>
 
@@ -300,7 +308,7 @@ export function render(ctx: PreferenceContext){
       <br>
       
       <button id=downloadPrefs>Download your prefs</button>
-      <sub>${ctx.currentPrefNumber +1}/${ctx.prefSize}</sub>
+      <sub>${prefCtx.currentPrefNumber +1}/${prefCtx.prefSize}</sub>
     </section>
     `;
 
@@ -309,7 +317,7 @@ export function render(ctx: PreferenceContext){
     makeIconButtonsWork(section, ctx)
   })
   makeConfigWork(app, ctx)
-  app.querySelector('#downloadPrefs')?.addEventListener("click", () => downloadPrefs(ctx))
+  app.querySelector('#downloadPrefs')?.addEventListener("click", () => downloadPrefs(prefCtx))
 }
-globalShortcuts(ctx)
-render(ctx)
+globalShortcuts(allCtx)
+render(allCtx)

@@ -137,3 +137,11 @@ export interface ComparisonContext {
   currentMetamorNumber: number
   toCompare: PreferenceProfile[]
 }
+/**
+ * Global context object to help with passing state around
+ */
+export interface AllContext{
+  preferenceContext: PreferenceContext
+  comparisonContext: ComparisonContext
+  uploadContext: UploadContext
+}

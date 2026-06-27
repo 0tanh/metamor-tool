@@ -1,22 +1,7 @@
 import { type PreferenceProfile, type ComparisonConfig, type NotesConfigType, NotesConfig, type ComparisonUnit, type ComparisonContext, type MetamorIconMap, type Preference, type UploadContext, PreferenceIcon } from '../lib/PreferenceTypes'
 
-const uploadCtx = {
-    currentMetamorNumber : 0,
-    toCompare : []
-}
+import { allCtx } from './build'
 
-const config:ComparisonConfig = {
-    max_acceptable_misalign : 2, 
-    show_full: false,
-    notes_config : NotesConfig.ALL_NOTES,
-    show_pain_points : true, //These are points that are diametrically opposed
-    show_perfect_matches : false, //These match perfectly
-    show_uncomparable : false
-}
-const ctx:ComparisonContext = {
-    allComparisonUnits: [],
-    config : config
-}
 /**
  * Given the comparison context, render all comparison units
  * @param ctx the current comparison context
@@ -388,9 +373,9 @@ function renderUpload(uploadCtx: Object, comparisonCtx: ComparisonContext){
 }
 /**
  * Given the current Comparison Context, Render an analysis
- * @param ctx the comparison context being taken in to render
+ * @param compCtx the comparison context being taken in to render
  */
-function renderAnalysis(ctx: ComparisonContext){
+function renderAnalysis(compCtx: ComparisonContext){
     const { 
       max_acceptable_misalign,
       show_pain_points,
@@ -398,23 +383,23 @@ function renderAnalysis(ctx: ComparisonContext){
       notes_config,
       show_perfect_matches,
       show_uncomparable, 
-    } = ctx.config
+    } = compCtx.config
     
-    const all_uncomparable_prefs = ctx.all_uncomparable_prefs
+    const all_uncomparable_prefs = compCtx.all_uncomparable_prefs
     
     const app = document.querySelector<HTMLDivElement>('#prefsAnalysis')!;
     
     app.innerHTML = `
         <section id="allComparisonSections">
-        ${ renderMisalign(max_acceptable_misalign, ctx)}
-        ${ show_pain_points ? render_pain_points(ctx) : '' }
-        ${ show_perfect_matches ? render_perfect_matches(ctx) : ''}
-        ${ render_notes(notes_config, ctx) }
-        ${ show_uncomparable ? render_uncomparable(all_uncomparable_prefs, ctx) : ''}
-        ${ show_full ? render_full(ctx): ''}
+        ${ renderMisalign(max_acceptable_misalign, compCtx)}
+        ${ show_pain_points ? render_pain_points(compCtx) : '' }
+        ${ show_perfect_matches ? render_perfect_matches(compCtx) : ''}
+        ${ render_notes(notes_config, compCtx) }
+        ${ show_uncomparable ? render_uncomparable(all_uncomparable_prefs, compCtx) : ''}
+        ${ show_full ? render_full(compCtx): ''}
         </section>
     `
 }
 
-renderUpload(uploadCtx, ctx)
+renderUpload(allCtx.uploadContext, allCtx.comparisonContext)
 
