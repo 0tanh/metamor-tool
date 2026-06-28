@@ -1,4 +1,4 @@
-import { type PreferenceProfile, type ComparisonConfig, type NotesConfigType, NotesConfig, type ComparisonUnit, type ComparisonContext, type MetamorIconMap, type Preference, type UploadContext, PreferenceIcon } from '../lib/PreferenceTypes'
+import { type PreferenceProfile, type ComparisonConfig, type NotesConfigType, NotesConfig, type ComparisonUnit, type ComparisonContext, type MetamorIconMap, type Preference, type UploadContext, PreferenceIcon, type AllContext } from '../lib/PreferenceTypes'
 
 import { allCtx } from './build'
 
@@ -11,7 +11,7 @@ function render_full(ctx: ComparisonContext): string{
     const all_units = ctx.allComparisonUnits.map((unit)=>{
         const name = unit.prefName;
         console.log(unit)
-        const metamorIconMap = unit.metamorIconMap
+        const metamorIconMap = unit.metamorIconMaps
         const singleUnitOut = `
         <h3 id="${name}ComparisonUnitPref" class="comparisonUnit">${name}</h3>
         <section id="${name}ComparisonMetamorMap">
@@ -36,6 +36,7 @@ function render_full(ctx: ComparisonContext): string{
     `
     return output
 }
+
 /**
  * Takes in the maximum acceptable misalignment and renders the misalignment
  * @param max_acceptable_misalign the maximum amount of allowed misalignment
@@ -44,23 +45,23 @@ function render_full(ctx: ComparisonContext): string{
  */
 function renderMisalign(max_acceptable_misalign: number, ctx: ComparisonContext){
     const misAlign = ctx.allComparisonUnits.filter((v)=>{
-        const minimum = Math.min(...v.metamorIconMap.map((m)=>m.icon.valueOf()))
-        const max = Math.max(...v.metamorIconMap.map((m)=>m.icon.valueOf()))
+        const minimum = Math.min(...v.metamorIconMaps.map((m)=>m.icon.valueOf()))
+        const max = Math.max(...v.metamorIconMaps.map((m)=>m.icon.valueOf()))
         const diff = max - minimum;
         return diff >= max_acceptable_misalign
     }).map((compU)=>{
         const formattedMap =`
-            ${compU.metamorIconMap.map((cu)=>{
+            ${compU.metamorIconMaps.map((cu)=>{
                 const wordForIcon = Object.keys(PreferenceIcon)[cu.icon.valueOf() -1] 
                 const metaIcon = `
                     <p> ${cu.metamorName} => ${wordForIcon}</p>
+                    ${cu.note !== '' ? `<p>${cu.metamorName} also added this note: </p><p>${cu.note}<p>` : ''}
                     
                     `
                 return metaIcon
             }).join('')
             }
         `
-        
         const formatted =`
             <h3>${compU.prefName}</h3>
             <p>${formattedMap}</p>
@@ -76,12 +77,7 @@ function renderMisalign(max_acceptable_misalign: number, ctx: ComparisonContext)
     return output
 }
 
-function render_notes(notesConfig: NotesConfigType, ctx: ComparisonContext){
-    const output = `
-    <h2 class='comparisonSection' >Notes</h2>
-    `
-    return output
-}
+
 /**
  * Renders all the points where two people's beliefs are diametrically opposed
  * @param ctx Comparison context
@@ -89,7 +85,7 @@ function render_notes(notesConfig: NotesConfigType, ctx: ComparisonContext){
  */
 function render_pain_points(ctx: ComparisonContext){
     const pain_point = ctx.allComparisonUnits.filter((compUnit)=>{
-        const mapList = compUnit.metamorIconMap
+        const mapList = compUnit.metamorIconMaps
         const min = mapList.filter((unit)=>{
             const min = unit.icon.valueOf() == 1
             return min
@@ -102,7 +98,7 @@ function render_pain_points(ctx: ComparisonContext){
     }).map((compUnit)=>{
         const multiMetamor = `
         <p> These metamors are diametrically opposed on this issue </p>
-            ${compUnit.metamorIconMap.map((p)=>{
+            ${compUnit.metamorIconMaps.map((p)=>{
                 const output = `<p>${p.metamorName}</p>`
                 return output
             }).join('')} 
@@ -110,7 +106,7 @@ function render_pain_points(ctx: ComparisonContext){
         `
         const output = `
             <p>${compUnit.prefName}</p>
-            ${compUnit.metamorIconMap.length > 2 ? multiMetamor : ''}
+            ${compUnit.metamorIconMaps.length > 2 ? multiMetamor : ''}
         `
         return output
     }).join('')
@@ -123,17 +119,28 @@ function render_pain_points(ctx: ComparisonContext){
 }
 
 function render_perfect_matches(ctx: ComparisonContext){
+    const config = ctx.config;
     const perfectMatches = ctx.allComparisonUnits
         .filter((cu)=>{
-            const iconMapList = cu.metamorIconMap;
-            const first = cu.metamorIconMap[0]?.icon.valueOf()
+            const iconMapList = cu.metamorIconMaps;
+            const first = cu.metamorIconMaps[0]?.icon.valueOf()
             const cleaned = iconMapList.filter((metamorMap)=> {return metamorMap.icon.valueOf() == first})
-            return cu.metamorIconMap.length == cleaned.length
+            return cu.metamorIconMaps.length == cleaned.length
         })
         .map((cu)=>{
-            const normalName = Object.keys(PreferenceIcon)[cu.metamorIconMap[0]?.icon.valueOf()]
+            const notes = cu.metamorIconMaps.map((map)=>{
+                const output = `
+                    <p> ${map.metamorName} also added this note </p>
+                    <br>
+                    <p> ${map.note} </p>
+                `
+                return output
+            })
+            const normalName = Object.keys(PreferenceIcon)[cu.metamorIconMaps[0]?.icon.valueOf()]
             const formatted =`
                 <p>${cu.prefName} => ${normalName}</p>
+                
+                ${config.notes_config !== 'ALL_NOTES' ? notes : ''}
             `
             return formatted
         })
@@ -149,6 +156,109 @@ function render_uncomparable(all_uncomparable_perfs: {metamorName :string, unmat
     const output = `<h2 class='comparisonSection'>all uncomparable </h2>`
     return output
 }
+
+/**
+ * Find the misaligned Preferences
+ * @param max_acceptable_misalign 
+ * @param ctx 
+ * @returns 
+ */
+function findMisaligned(max_acceptable_misalign:number, ctx: ComparisonContext){
+    const misAlign = ctx.allComparisonUnits.filter((v)=>{
+        const minimum = Math.min(...v.metamorIconMaps.map((m)=>m.icon.valueOf()))
+        const max = Math.max(...v.metamorIconMaps.map((m)=>m.icon.valueOf()))
+        const diff = max - minimum;
+        return diff >= max_acceptable_misalign
+    })
+    return misAlign
+}
+function render_notes(allCtx: AllContext){
+    const ctx = allCtx.comparisonContext
+    const config = ctx.config
+    
+    const all_notes = ctx.allComparisonUnits
+        .map((cu)=>{
+            const all_notes = cu.metamorIconMaps.map((map)=>{
+                const output = `
+                    <p> ${map.metamorName} also added this note </p>
+                    <br>
+                    <p> ${map.note} </p>
+                    <br>
+                `
+                return output
+            }).join('')
+            
+            const wrapping = `
+                <p>"${cu.prefName}" Notes</p>
+                <br>
+                <p> ${all_notes} </p>
+                `
+
+            return all_notes
+        })
+        .join('')
+    
+    const filtered = findMisaligned(config.max_acceptable_misalign, ctx)
+    
+    const misaligned_notes = filtered.map((cu) => 
+        cu.metamorIconMaps.map((map)=>{
+            const output = `
+                <p> ${map.metamorName} also added this note </p>
+                <br>
+                <p> ${map.note} </p>
+                <br>
+            `
+            return output
+        }).join('')).join('')
+    
+    const perfectMatches = ctx.allComparisonUnits
+        .filter((cu)=>{
+            const iconMapList = cu.metamorIconMaps;
+            const first = cu.metamorIconMaps[-1]?.icon.valueOf()
+            const cleaned = iconMapList.filter((metamorMap)=> {return metamorMap.icon.valueOf() == first})
+            return cu.metamorIconMaps.length == cleaned.length
+        })
+
+    const hide_perfect = ctx.allComparisonUnits
+        .filter((cu)=>{!perfectMatches.includes(cu)})
+        .map((cu) => 
+        cu.metamorIconMaps.map((map)=>{
+            const output = `
+                <p> ${map.metamorName} also added this note </p>
+                <br>
+                <p> ${map.note} </p>
+                <br>
+            `
+            return output
+        }).join(''))
+    
+    let which_notes = ``
+    
+    switch (config.notes_config){
+        case 'ALL_NOTES':
+            which_notes = all_notes
+            break
+        case 'HIDE_PERFECT':
+            which_notes = hide_perfect
+            break
+        case 'ONLY_MISALIGNED':
+            which_notes = misaligned_notes 
+        }
+
+    const normalName = Object.keys(PreferenceIcon)[cu.metamorIconMap[-1]?.icon.valueOf()]
+    const formatted =`
+        <p>${cu.prefName} => ${normalName}</p>
+        
+        ${config.notes_config !== 'ALL_NOTES' ? all_notes : ''}
+        `
+    const output = `
+    <h1 class='comparisonSection' >Just Notes</h2>
+    <p> Current Note Configuration = ${ctx.config.notes_config} </p>
+    
+    `
+    return output
+}
+
 /**
  * Takes in a preference profile and returns a smaller preference profile with only 
  * non null preferences
@@ -185,15 +295,18 @@ function findAllComparisonUnits(smallest: PreferenceProfile, cleanedCompare: Pre
         if (!available_in_all_profiles){
             continue
         }
-    
+        
+        const firstNote = pSmall.note
+
         const firstIconMap: MetamorIconMap = {
             metamorName: smallest.metamorName,
-            icon: pSmall.iconValue
+            icon: pSmall.iconValue,
+            note: firstNote
         }
 
         let currentPref: ComparisonUnit = {
             prefName : currentPrefName,
-            metamorIconMap : [firstIconMap]
+            metamorIconMaps : [firstIconMap]
         }
         for (const profile of cleanedCompare){
             if (profile.metamorName === smallest.metamorName){
@@ -209,9 +322,10 @@ function findAllComparisonUnits(smallest: PreferenceProfile, cleanedCompare: Pre
             
             const thisMap: MetamorIconMap = {
                 metamorName : profile.metamorName,
-                icon : found?.iconValue
+                icon : found?.iconValue,
+                note: found?.note
             }
-            currentPref.metamorIconMap.push(thisMap)
+            currentPref.metamorIconMaps.push(thisMap)
             
         }
         outputUnits.push(currentPref)
@@ -394,7 +508,7 @@ function renderAnalysis(compCtx: ComparisonContext){
         ${ renderMisalign(max_acceptable_misalign, compCtx)}
         ${ show_pain_points ? render_pain_points(compCtx) : '' }
         ${ show_perfect_matches ? render_perfect_matches(compCtx) : ''}
-        ${ render_notes(notes_config, compCtx) }
+        ${ render_notes(allCtx) }
         ${ show_uncomparable ? render_uncomparable(all_uncomparable_prefs, compCtx) : ''}
         ${ show_full ? render_full(compCtx): ''}
         </section>

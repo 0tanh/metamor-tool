@@ -107,6 +107,7 @@ export interface ComparisonConfig {
 export interface MetamorIconMap {
   metamorName: string
   icon: PreferenceIconType
+  note?: string
 }
 
 /**
@@ -115,7 +116,7 @@ export interface MetamorIconMap {
  */
 export interface ComparisonUnit {
   prefName: string
-  metamorIconMap: MetamorIconMap[]
+  metamorIconMaps: MetamorIconMap[]
 }
 
 /**

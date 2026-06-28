@@ -145,8 +145,12 @@ function makeIconButtonsWork(section: HTMLElement, allctx: AllContext){
       section.querySelector(notesSubmitSelector)?.addEventListener("click", handleSubmit)
     })
 }
-
-function handleSubmit(notesValue: string, allctx: AllContext){
+/**
+ * Submit a note
+ * @param notesValue 
+ * @param allctx 
+ */
+function handleNotesSubmit(notesValue: string, allctx: AllContext){
   const ctx = allctx.preferenceContext
   ctx.currentPreferenceProfile.metamorPrefs[ctx.currentPrefNumber].note = notesValue;
   render(allctx)
@@ -241,7 +245,7 @@ function globalShortcuts(ctx: AllContext){
         const nameKebab = kebabCase(ctx.preferenceContext.currentPref.name)
         const notesSelector = `#${nameKebab}Notes`
         let notesText = document.querySelector(notesSelector) as HTMLInputElement
-        handleSubmit(notesText.value, ctx)
+        handleNotesSubmit(notesText.value, ctx)
         break
 
       case "0":

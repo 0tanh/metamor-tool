@@ -16,7 +16,6 @@ export function configRender(config: ComparisonConfig): string{
       const iconString = String(icon);
       const isActive = config.notes_config === NotesConfig[icon as keyof typeof NotesConfig];
       const activeClass = isActive ? "NotesButton active" : "NotesButton";
-      
       return `
       <button 
         class= ${activeClass}
