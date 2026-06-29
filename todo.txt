@@ -1,0 +1,4 @@
+(A) Any styling at all
+(A) fix global number input bug in the comments box
+(A) Fix upload another metamor's prefs
+(A) fix nesting of preference profile label in upload section
