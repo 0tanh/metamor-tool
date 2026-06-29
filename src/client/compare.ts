@@ -230,7 +230,7 @@ function render_notes(allCtx: AllContext){
                 <br>
             `
             return output
-        }).join(''))
+        }).join('')).join('')
     
     let which_notes = ``
     
@@ -242,18 +242,24 @@ function render_notes(allCtx: AllContext){
             which_notes = hide_perfect
             break
         case 'ONLY_MISALIGNED':
-            which_notes = misaligned_notes 
+            which_notes = misaligned_notes
+            break
         }
-
-    const normalName = Object.keys(PreferenceIcon)[cu.metamorIconMap[-1]?.icon.valueOf()]
-    const formatted =`
-        <p>${cu.prefName} => ${normalName}</p>
-        
-        ${config.notes_config !== 'ALL_NOTES' ? all_notes : ''}
-        `
-    const output = `
+    const allFormatted = ctx.allComparisonUnits.map((cu)=>{
+            cu.metamorIconMaps.map((map)=>{
+            const normalName = Object.keys(PreferenceIcon)[map.icon.valueOf()]
+            const formatted =
+                `
+                <p>${cu.prefName} => ${normalName}</p>
+                
+                ${config.notes_config !== 'ALL_NOTES' ? all_notes : ''}
+                `
+            return formatted})
+        }).join('')
+        const output = `
     <h1 class='comparisonSection' >Just Notes</h2>
     <p> Current Note Configuration = ${ctx.config.notes_config} </p>
+    <section>${allFormatted}</section>
     
     `
     return output
@@ -403,11 +409,10 @@ function handleFileUpload(section: HTMLElement, uploadInput: HTMLInputElement, u
     reader.onload = (e: ProgressEvent<FileReader>) => {
         const result = e.target?.result;
         if (typeof result === 'string') {
+            try {
             const jsonData = JSON.parse(result);
-            
             console.log(jsonData)
             const nextProfile: PreferenceProfile = jsonData
-            
             if (nextProfile != undefined) {
                 uploadCtx.currentMetamorNumber ++
                 uploadCtx.toCompare.push(nextProfile)
@@ -432,14 +437,30 @@ function handleFileUpload(section: HTMLElement, uploadInput: HTMLInputElement, u
             makeFileUploadWork(newFieldContainer, uploadCtx, comparisonCtx)
             
             const analyseButton =`
-                <button id='startComparisonButton'>Start Comparison</button>
+            <label><button id='startComparisonButton'>Start Comparison</button></label>
             `
+            
             const buttonExists = document.querySelector('#startComparisonButton') !== null;
             
+            const reanalyseButton = `
+            <label id="ReanalyseLabel" style="display: none;">Reanalyse?<button id='ReanalyseButton'>Reanalyse</button></label>
+            `
+            
             if (uploadCtx.currentMetamorNumber >= 2 && !buttonExists) {
+                
+                section.insertAdjacentHTML('beforeend', reanalyseButton)
+                section.querySelector('#ReanalyseButton')?.addEventListener('click', () => handleAnalysis(uploadCtx, comparisonCtx))
+                
                 section.insertAdjacentHTML('beforeend', analyseButton)
-                section.querySelector('#startComparisonButton')?.addEventListener('click', () => handleAnalysis(uploadCtx, comparisonCtx))
+                section.querySelector('#startComparisonButton')?.addEventListener('click', () => {
+                    handleAnalysis(uploadCtx, comparisonCtx)
+                    
+                })
             }
+            } catch (error){
+                console.log(error)
+            }
+
         }
     };
 }
@@ -449,7 +470,7 @@ function handleFileUpload(section: HTMLElement, uploadInput: HTMLInputElement, u
  * @param section the scope in which the file upload will have listeners added
  * @param ctx current context
  */
-function makeFileUploadWork(section: HTMLElement, uploadCtx: Object, ctx: ComparisonContext){
+function makeFileUploadWork(section: HTMLElement, uploadCtx: UploadContext, ctx: ComparisonContext){
     const fileInput = section.querySelectorAll('.prefsUpload');
 
     // 2. Listen for the file selection event
@@ -501,18 +522,23 @@ function renderAnalysis(compCtx: ComparisonContext){
     
     const all_uncomparable_prefs = compCtx.all_uncomparable_prefs
     
+    const label = document.querySelector<HTMLElement>("#ReanalyseLabel")!;
+
+    label.style.display = "revert"
+
     const app = document.querySelector<HTMLDivElement>('#prefsAnalysis')!;
     
     app.innerHTML = `
-        <section id="allComparisonSections">
-        ${ renderMisalign(max_acceptable_misalign, compCtx)}
-        ${ show_pain_points ? render_pain_points(compCtx) : '' }
-        ${ show_perfect_matches ? render_perfect_matches(compCtx) : ''}
-        ${ render_notes(allCtx) }
-        ${ show_uncomparable ? render_uncomparable(all_uncomparable_prefs, compCtx) : ''}
-        ${ show_full ? render_full(compCtx): ''}
-        </section>
+    <section id="allComparisonSections">
+    ${ renderMisalign(max_acceptable_misalign, compCtx)}
+    ${ show_pain_points ? render_pain_points(compCtx) : '' }
+    ${ show_perfect_matches ? render_perfect_matches(compCtx) : ''}
+    ${ render_notes(allCtx) }
+    ${ show_uncomparable ? render_uncomparable(all_uncomparable_prefs, compCtx) : ''}
+    ${ show_full ? render_full(compCtx): ''}
+    </section>
     `
+    const section = app.querySelector("#allComparisonSections")
 }
 
 renderUpload(allCtx.uploadContext, allCtx.comparisonContext)
