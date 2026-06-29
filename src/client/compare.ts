@@ -182,18 +182,21 @@ function findMisaligned(max_acceptable_misalign:number, ctx: ComparisonContext){
  * @param allCtx all the current context 
  * @returns rendered notes
  */
-function renderNotes(allCtx: AllContext): string{
-    const ctx = allCtx.comparisonContext
+function renderNotes(allCtx: ComparisonContext): string{
+    const ctx = allCtx
     const config = ctx.config
+    console.log(ctx)
+
     const all_notes = ctx.allComparisonUnits
         .map((cu)=>{
             const all_notes = cu.metamorIconMaps.map((map)=>{
-                const output = `
-                    <p> ${map.metamorName} also added this note </p>
-                    <br>
-                    <p> ${map.note} </p>
+                const formatted = `
+                    <p> ${map.metamorName} added this note:
+                    <br> ${map.note} </p>
                     <br>
                 `
+                const note_empty = map.note == '' || map.note == null || map.note == "" || map.note == " " 
+                const output = note_empty ? '' : formatted
                 return output
             }).join('')
 
@@ -205,19 +208,18 @@ function renderNotes(allCtx: AllContext): string{
                 `
 
             return wrapping
-        })
-        .join('')
+        }).join('')
     
     const filtered = findMisaligned(config.max_acceptable_misalign, ctx)
-    
     const misaligned_notes = filtered.map((cu) => 
         cu.metamorIconMaps.map((map)=>{
-            const output = `
-                <p> ${map.metamorName} also added this note </p>
-                <br>
-                <p> ${map.note} </p>
+            const formatted = `
+                <p> ${map.metamorName} added this note:
+                <br> ${map.note} </p>
                 <br>
             `
+            const note_empty = map.note == '' || map.note == null || map.note == "" || map.note == " " 
+            const output = note_empty ? '' : formatted
             return output
         }).join('')).join('')
     
@@ -232,14 +234,15 @@ function renderNotes(allCtx: AllContext): string{
     const hide_perfect = ctx.allComparisonUnits
         .filter((cu)=>!perfectMatches.includes(cu))
         .map((cu) => 
-        cu.metamorIconMaps.map((map)=>{
-            const output = `
-                <p> ${map.metamorName} added this note </p>
-                <br>
-                <p> ${map.note} </p>
-                <br>
-            `
-            return output
+            cu.metamorIconMaps.map((map)=>{
+                const formatted = `
+                    <p> ${map.metamorName} added this note:
+                    <br> ${map.note} </p>
+                    <br>
+                `
+                const note_empty = map.note == '' || map.note == null || map.note == "" || map.note == " " 
+                const output = note_empty ? '' : formatted
+                return output
         }).join('')).join('')
     
     let which_notes = ``
@@ -255,30 +258,32 @@ function renderNotes(allCtx: AllContext): string{
             which_notes = misaligned_notes
             break
         }
-    const allFormatted = ctx.allComparisonUnits.map((cu)=>{
-        console.log('first map')
-        const first_formatted = cu.metamorIconMaps.map((map)=>{
+        const allFormatted = ctx.allComparisonUnits.map((cu)=>{
+            console.log('first map')
             
+            const first_formatted = cu.metamorIconMaps.map((map)=>{
+                
             const normalName = Object.keys(PreferenceIcon)[map.icon.valueOf()]
-            const formatted =
-                `
-                <p>${cu.prefName} => ${normalName}</p>
-                
-                `
-                return formatted}
-                
-            ).join('')
-
-            const output = `
-            ${first_formatted}
-            ${which_notes}
+            const pref_to_name =
             `
-            return output
-        }).join('')
+            <p>${cu.prefName} => ${normalName}</p>
+            `
+            return pref_to_name
+        }
+        
+    ).join('')
+    
     const output = `
-        <h2 class='comparisonSection'> Just Notes </h2>
-        <p> Current Note Configuration = ${ctx.config.notes_config} </p>
-        <section>${allFormatted}</section>
+    ${first_formatted}
+    ${all_notes}
+    `
+    return output
+    }).join('')
+
+    const output = `
+    <h2 class='comparisonSection'> Just Notes </h2>
+    <p> Current Note Configuration = ${ctx.config.notes_config} </p>
+    <section>${allFormatted}</section>
     `
     return output
 }
@@ -557,7 +562,7 @@ function renderAnalysis(compCtx: ComparisonContext){
     ${ renderMisalign(max_acceptable_misalign, compCtx)}
     ${ show_pain_points ? renderPainPoints(compCtx) : '' }
     ${ show_perfect_matches ? renderPerfectMatches(compCtx) : ''}
-    ${ renderNotes(allCtx) }
+    ${ renderNotes(compCtx) }
     ${ show_uncomparable ? renderUncomparable(all_uncomparable_prefs, compCtx) : ''}
     ${ show_full ? render_full(compCtx): ''}
     </section>
