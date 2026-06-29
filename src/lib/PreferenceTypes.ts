@@ -124,6 +124,7 @@ export interface ComparisonUnit {
  */
 export interface ComparisonContext {
   allComparisonUnits: ComparisonUnit[]
+  show_reanalyse? : boolean
   all_uncomparable_prefs?:{
     metamorName: string,
     unmatchedPref: Preference
