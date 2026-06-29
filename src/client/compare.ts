@@ -257,10 +257,9 @@ function render_notes(allCtx: AllContext){
             return formatted})
         }).join('')
         const output = `
-    <h1 class='comparisonSection' >Just Notes</h2>
-    <p> Current Note Configuration = ${ctx.config.notes_config} </p>
-    <section>${allFormatted}</section>
-    
+            <h2 class='comparisonSection'> Just Notes </h2>
+            <p> Current Note Configuration = ${ctx.config.notes_config} </p>
+            <section>${allFormatted}</section>
     `
     return output
 }
