@@ -20,7 +20,6 @@ export function configRender(config: ComparisonConfig): string{
       <button 
         class= ${activeClass}
         id="${iconString}Button" 
-        class="NotesButton" 
         >${iconString}
       </button>
     `}
@@ -106,8 +105,8 @@ function handleName(section: HTMLElement, allCtx: AllContext){
 }
 
 /**
- * The Icon You have chosen is saved to the state
- * @param chosenIcon The chosen icon
+ * The Note you have chosen is saved to the state
+ * @param chosenNote The chosen icon
  * @param ctx the current preference context
  */
 function handleNotes(chosenNote: NotesConfigType, allctx: AllContext){
@@ -115,17 +114,16 @@ function handleNotes(chosenNote: NotesConfigType, allctx: AllContext){
   ctx.notes_config = chosenNote
   render(allctx)
 }
-
 /**
- * Activate all the callbacks for configuration
+ * Activate all the callbacks for which kinds of notes you want to see
  * @param section takes in the section where the config lives and maps functionality to all buttons
  * @param ctx the preference context
  */
-function makeNotesSelectionWork(section: HTMLElement, allCtx: AllContext){
+export function makeNotesSelectionWork(section: HTMLElement, allCtx: AllContext){
   Object.keys(NotesConfig).forEach((icon)=>{
        
       const iconString = String(icon)
-      const notesSelector = `#${iconString}Notes`
+      const notesSelector = `#${iconString}Button`
       let notesText = section.querySelector(notesSelector) as HTMLInputElement
       
       

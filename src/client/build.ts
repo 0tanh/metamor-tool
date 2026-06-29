@@ -1,7 +1,7 @@
 import '../style.css'
 import { NotesConfig, PreferenceIcon } from '../lib/PreferenceTypes';
 import type { Preference, PreferenceProfile, PreferenceContext, PreferenceIconType, ComparisonConfig, ComparisonContext, AllContext } from '../lib/PreferenceTypes';
-import { configRender, makeConfigWork } from './config';
+import { configRender, makeConfigWork, makeNotesSelectionWork } from './config';
 
 const metamor_default_URL = "http://localhost:3000"
 
@@ -355,6 +355,7 @@ export function render(ctx: AllContext){
     makeIconButtonsWork(section, ctx)
   })
   makeConfigWork(app, ctx)
+  makeNotesSelectionWork(app, ctx)
   app.querySelector('#downloadPrefs')?.addEventListener("click", () => downloadPrefs(prefCtx))
   app.querySelector('#clearAllPrefs')?.addEventListener("click", () => clearAllPrefs(ctx))
 }

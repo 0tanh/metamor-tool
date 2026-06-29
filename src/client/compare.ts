@@ -83,7 +83,7 @@ function renderMisalign(max_acceptable_misalign: number, ctx: ComparisonContext)
  * @param ctx Comparison context
  * @returns 
  */
-function render_pain_points(ctx: ComparisonContext){
+function renderPainPoints(ctx: ComparisonContext){
     const pain_point = ctx.allComparisonUnits.filter((compUnit)=>{
         const mapList = compUnit.metamorIconMaps
         const min = mapList.filter((unit)=>{
@@ -117,8 +117,12 @@ function render_pain_points(ctx: ComparisonContext){
     `
     return output
 }
-
-function render_perfect_matches(ctx: ComparisonContext){
+/**
+ * Render The perfect matches display
+ * @param ctx context being taken in
+ * @returns a string representing all the perfected matches
+ */
+function renderPerfectMatches(ctx: ComparisonContext){
     const config = ctx.config;
     const perfectMatches = ctx.allComparisonUnits
         .filter((cu)=>{
@@ -152,7 +156,7 @@ function render_perfect_matches(ctx: ComparisonContext){
     return output
 }
 
-function render_uncomparable(all_uncomparable_perfs: {metamorName :string, unmatchedPref: Preference }[], ctx: ComparisonContext){
+function renderUncomparable(all_uncomparable_perfs: {metamorName :string, unmatchedPref: Preference }[], ctx: ComparisonContext){
     const output = `<h2 class='comparisonSection'>all uncomparable </h2>`
     return output
 }
@@ -172,7 +176,13 @@ function findMisaligned(max_acceptable_misalign:number, ctx: ComparisonContext){
     })
     return misAlign
 }
-function render_notes(allCtx: AllContext){
+
+/**
+ * Render the notes based on the selected preference.
+ * @param allCtx all the current context 
+ * @returns rendered notes
+ */
+function renderNotes(allCtx: AllContext): string{
     const ctx = allCtx.comparisonContext
     const config = ctx.config
     
@@ -194,7 +204,7 @@ function render_notes(allCtx: AllContext){
                 <p> ${all_notes} </p>
                 `
 
-            return all_notes
+            return wrapping
         })
         .join('')
     
@@ -214,17 +224,17 @@ function render_notes(allCtx: AllContext){
     const perfectMatches = ctx.allComparisonUnits
         .filter((cu)=>{
             const iconMapList = cu.metamorIconMaps;
-            const first = cu.metamorIconMaps[-1]?.icon.valueOf()
+            const first = cu.metamorIconMaps[0]?.icon.valueOf()
             const cleaned = iconMapList.filter((metamorMap)=> {return metamorMap.icon.valueOf() == first})
             return cu.metamorIconMaps.length == cleaned.length
         })
 
     const hide_perfect = ctx.allComparisonUnits
-        .filter((cu)=>{!perfectMatches.includes(cu)})
+        .filter((cu)=>!perfectMatches.includes(cu))
         .map((cu) => 
         cu.metamorIconMaps.map((map)=>{
             const output = `
-                <p> ${map.metamorName} also added this note </p>
+                <p> ${map.metamorName} alreturn output this note </p>
                 <br>
                 <p> ${map.note} </p>
                 <br>
@@ -246,20 +256,27 @@ function render_notes(allCtx: AllContext){
             break
         }
     const allFormatted = ctx.allComparisonUnits.map((cu)=>{
-            cu.metamorIconMaps.map((map)=>{
+        const first_formatted = cu.metamorIconMaps.map((map)=>{
             const normalName = Object.keys(PreferenceIcon)[map.icon.valueOf()]
             const formatted =
                 `
                 <p>${cu.prefName} => ${normalName}</p>
                 
-                ${config.notes_config !== 'ALL_NOTES' ? all_notes : ''}
                 `
-            return formatted})
+                return formatted}
+                
+            ).join('')
+
+            const output = `
+            ${first_formatted}
+            ${which_notes}
+            `
+            return output
         }).join('')
-        const output = `
-            <h2 class='comparisonSection'> Just Notes </h2>
-            <p> Current Note Configuration = ${ctx.config.notes_config} </p>
-            <section>${allFormatted}</section>
+    const output = `
+        <h2 class='comparisonSection'> Just Notes </h2>
+        <p> Current Note Configuration = ${ctx.config.notes_config} </p>
+        <section>${allFormatted}</section>
     `
     return output
 }
@@ -388,76 +405,84 @@ function handleAnalysis(uploadCtx: UploadContext, comparisonCtx: ComparisonConte
  */
 function handleFileUpload(section: HTMLElement, uploadInput: HTMLInputElement, uploadCtx: UploadContext, comparisonCtx: ComparisonContext){
     
-    // Check if any files were selected
     if (!uploadInput.files || uploadInput.files.length === 0) {
         return;
     }
-
-    // 3. Extract basic file metadata
+    
     const file: File = uploadInput.files[0];
     console.log(`File Name: ${file.name}`);
     console.log(`File Size: ${file.size} bytes`);
     console.log(`File Type: ${file.type}`);
 
-    // 4. Extract internal file content using FileReader
     const reader = new FileReader();
-    // Trigger the reader to extract text data
+    
     reader.readAsText(file);
-
+    
     // This event fires sequentially once the file reading is completely finished
     reader.onload = (e: ProgressEvent<FileReader>) => {
         const result = e.target?.result;
         if (typeof result === 'string') {
             try {
-            const jsonData = JSON.parse(result);
-            console.log(jsonData)
-            const nextProfile: PreferenceProfile = jsonData
-            if (nextProfile != undefined) {
-                uploadCtx.currentMetamorNumber ++
-                uploadCtx.toCompare.push(nextProfile)
-            }
+                const jsonData = JSON.parse(result);
+                console.log(jsonData)
+                const nextProfile: PreferenceProfile = jsonData
+                if (nextProfile != undefined) {
+                    uploadCtx.currentMetamorNumber ++
+                    uploadCtx.toCompare.push(nextProfile)
+                }
+                const previousId = `#upload-wrapper-${uploadCtx.currentMetamorNumber}`;
+                const prev = section.querySelector(previousId)
+                prev == null ? '' : prev.textContent = ''
             
-            const nextMetamorName = `<p>${nextProfile.metamorName}'s Preference Profile</p>`
-                section.insertAdjacentHTML('beforebegin', nextMetamorName)
-            
-            const dynamicId = `upload-wrapper-${uploadCtx.currentMetamorNumber}`;
-            
-            const uploadAnother= `
-            <br>
-            <div id= "${dynamicId}">
-            <label class='prefsUploadLabel'> Upload another metamor's preferences <br>
-                <input type="file" class="prefsUpload"/>
-            </label>
-            </div>
-            ` 
-            section.insertAdjacentHTML('beforeend', uploadAnother)
-            
-            const newFieldContainer = section.querySelector<HTMLElement>(`#${dynamicId}`)!;
-            makeFileUploadWork(newFieldContainer, uploadCtx, comparisonCtx)
-            
-            const analyseButton =`
-            <label><button id='startComparisonButton'>Start Comparison</button></label>
-            `
-            
-            const buttonExists = document.querySelector('#startComparisonButton') !== null;
-            
-            const reanalyseButton = `
-            <label id="ReanalyseLabel" style="display: none;">Reanalyse?<button id='ReanalyseButton'>Reanalyse</button></label>
-            `
-            
-            if (uploadCtx.currentMetamorNumber >= 2 && !buttonExists) {
+                const dynamicId = `upload-metamor-${uploadCtx.currentMetamorNumber}`;
                 
-                section.insertAdjacentHTML('beforeend', reanalyseButton)
-                section.querySelector('#ReanalyseButton')?.addEventListener('click', () => handleAnalysis(uploadCtx, comparisonCtx))
+                const toHide = `metamor-${uploadCtx.currentMetamorNumber}-Label`
+                const hide_span = section.querySelector<HTMLElement>(`#${toHide}`)
                 
-                section.insertAdjacentHTML('beforeend', analyseButton)
-                section.querySelector('#startComparisonButton')?.addEventListener('click', () => {
-                    handleAnalysis(uploadCtx, comparisonCtx)
+                if (hide_span) {
+                    const hide = "font-size: 0px; border: 0px; display: none;";
+                    const firstUpload = document.querySelector<HTMLElement>('#firstUpload')
+                    hide_span.style.cssText = hide;
+                    firstUpload.style.cssText = hide
+                }
+                
+                const nextID = `metamor-${uploadCtx.currentMetamorNumber+1}-Label`
+                
+                const uploadAnother= `
+                <section id= "${dynamicId}">
+                <label class='prefsUploadLabel'> <span id="${nextID}">Upload another metamor's preferences </span>
+                    <input type="file" class="prefsUpload"/>
+                </label>
+                </section>
+                ` 
+                
+                const nextMetamorName = `<p>${nextProfile.metamorName}'s Preference Profile added! </p>`
+                section.insertAdjacentHTML('beforeend', nextMetamorName)
+                section.insertAdjacentHTML('beforeend', uploadAnother)
+                
+                const newFieldContainer = section.querySelector<HTMLElement>(`#${dynamicId}`)!;
+                makeFileUploadWork(section, uploadCtx, comparisonCtx)
+                
+                const analyseButton =`
+                <label><button id='startComparisonButton'>Start Comparison</button></label>
+                `
+                
+                const buttonExists = document.querySelector('#startComparisonButton') !== null;
+                
+                const reanalyseButton = `
+                <label id="ReanalyseLabel" style="display: none;">Reanalyse?<button id='ReanalyseButton'>Reanalyse</button></label>
+                `
+                
+                if (uploadCtx.currentMetamorNumber >= 2 && !buttonExists) {
+                    section.insertAdjacentHTML('beforeend', reanalyseButton)
+                    section.querySelector('#ReanalyseButton')?.addEventListener('click', () => handleAnalysis(uploadCtx, comparisonCtx))
                     
-                })
-            }
+                    section.insertAdjacentHTML('beforeend', analyseButton)
+                    section.querySelector('#startComparisonButton')?.addEventListener('click', () => handleAnalysis(uploadCtx, comparisonCtx))
+                }
             } catch (error){
                 console.log(error)
+                alert("Please upload a valid JSON")
             }
 
         }
@@ -485,10 +510,10 @@ function makeFileUploadWork(section: HTMLElement, uploadCtx: UploadContext, ctx:
  * @param uploadCtx The current upload context
  * @param comparisonCtx the current comparison context
  */
-function renderUpload(uploadCtx: Object, comparisonCtx: ComparisonContext){
+function renderUpload(uploadCtx: UploadContext, comparisonCtx: ComparisonContext){
     const app = document.querySelector<HTMLDivElement>('#comparePrefs')!;
     const uploadCopy = `
-    <label class='prefsUploadLabel'> Upload a metamor's preferences <br>
+    <label class='prefsUploadLabel'> <span id='firstUpload'> Upload a metamor's preferences </span>
         <input type="file" class="prefsUpload"/>
     </label>
     ` 
@@ -499,6 +524,7 @@ function renderUpload(uploadCtx: Object, comparisonCtx: ComparisonContext){
             ${uploadCopy}
         </section>
         <section id="prefsAnalysis"></section>
+        </section>
         `
     app.querySelectorAll(".allUploads").forEach((sec)=>{
         const section = sec as HTMLElement
@@ -530,10 +556,10 @@ function renderAnalysis(compCtx: ComparisonContext){
     app.innerHTML = `
     <section id="allComparisonSections">
     ${ renderMisalign(max_acceptable_misalign, compCtx)}
-    ${ show_pain_points ? render_pain_points(compCtx) : '' }
-    ${ show_perfect_matches ? render_perfect_matches(compCtx) : ''}
-    ${ render_notes(allCtx) }
-    ${ show_uncomparable ? render_uncomparable(all_uncomparable_prefs, compCtx) : ''}
+    ${ show_pain_points ? renderPainPoints(compCtx) : '' }
+    ${ show_perfect_matches ? renderPerfectMatches(compCtx) : ''}
+    ${ renderNotes(allCtx) }
+    ${ show_uncomparable ? renderUncomparable(all_uncomparable_prefs, compCtx) : ''}
     ${ show_full ? render_full(compCtx): ''}
     </section>
     `
