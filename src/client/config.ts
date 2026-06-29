@@ -47,14 +47,22 @@ export function configRender(config: ComparisonConfig): string{
     `
     return output
 }
-
+/**
+ * Make the full breakdown section button work
+ * @param section 
+ * @param allCtx 
+ */
 function handleFullBreakdown(section: HTMLElement, allCtx: AllContext){
   const config = allCtx.comparisonContext.config
   const input = section.querySelector('#showFullBreakdown') as HTMLInputElement
   config.show_full = input.checked
   render(allCtx)
 }
-
+/**
+ * Make the show pain points button work
+ * @param section 
+ * @param allCtx 
+ */
 function handleShowPainPoints(section: HTMLElement, allCtx: AllContext){
   const config = allCtx.comparisonContext.config
   const input = section.querySelector('#showPainPoints') as HTMLInputElement
@@ -62,7 +70,11 @@ function handleShowPainPoints(section: HTMLElement, allCtx: AllContext){
   render(allCtx)
 }
 
-
+/**
+ * Make the perfect Matches pain points button work
+ * @param section 
+ * @param allCtx 
+ */
 function handleShowPerfectMatches(section: HTMLElement, allCtx: AllContext){
   const config = allCtx.comparisonContext.config
   const input = section.querySelector('#showPerfectMatches') as HTMLInputElement
@@ -70,25 +82,61 @@ function handleShowPerfectMatches(section: HTMLElement, allCtx: AllContext){
   render(allCtx)
 }
 
-
+/**
+ * Make the show uncomparable button work
+ * @param section 
+ * @param allCtx 
+ */
 function handleShowUncomparable(section: HTMLElement, allCtx: AllContext){
   const config = allCtx.comparisonContext.config
   const input = section.querySelector('#showUncomparable') as HTMLInputElement
   config.show_uncomparable = input.checked
   render(allCtx)
 }
-
+/**
+ * Handle the name input section
+ * @param section 
+ * @param allCtx 
+ */
 function handleName(section: HTMLElement, allCtx: AllContext){
   const ctx = allCtx.preferenceContext
   const input = section.querySelector('#nameInput') as HTMLInputElement
   ctx.currentPreferenceProfile.metamorName = input.value
   render(allCtx)
 }
+
+/**
+ * The Icon You have chosen is saved to the state
+ * @param chosenIcon The chosen icon
+ * @param ctx the current preference context
+ */
+function handleNotes(chosenNote: NotesConfigType, allctx: AllContext){
+  const ctx = allctx.comparisonContext.config
+  ctx.notes_config = chosenNote
+  render(allctx)
+}
+
 /**
  * Activate all the callbacks for configuration
  * @param section takes in the section where the config lives and maps functionality to all buttons
  * @param ctx the preference context
  */
+function makeNotesSelectionWork(section: HTMLElement, allCtx: AllContext){
+  Object.keys(NotesConfig).forEach((icon)=>{
+       
+      const iconString = String(icon)
+      const notesSelector = `#${iconString}Notes`
+      let notesText = section.querySelector(notesSelector) as HTMLInputElement
+      
+      
+      const handleIconDynamic = () => {
+        const chosenIconValue = NotesConfig[icon as keyof typeof NotesConfig];
+        handleNotes(chosenIconValue, allCtx)
+      }      
+      section.querySelector(notesSelector)?.addEventListener("click", handleIconDynamic)
+    })
+}
+
 export function makeConfigWork(section: HTMLElement, allCtx: AllContext){
   section.querySelector("#submitName")?.addEventListener("click", () => handleName(section, allCtx))
   section.querySelector("#showFullBreakdown")?.addEventListener("change", () => handleFullBreakdown(section, allCtx))
