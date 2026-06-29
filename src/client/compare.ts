@@ -52,7 +52,7 @@ function renderMisalign(max_acceptable_misalign: number, ctx: ComparisonContext)
     }).map((compU)=>{
         const formattedMap =`
             ${compU.metamorIconMaps.map((cu)=>{
-                const wordForIcon = Object.keys(PreferenceIcon)[cu.icon.valueOf() -1] 
+                const wordForIcon = Object.keys(PreferenceIcon)[cu.icon.valueOf()] 
                 const metaIcon = `
                     <p> ${cu.metamorName} => ${wordForIcon}</p>
                     ${cu.note !== '' ? `<p>${cu.metamorName} also added this note: </p><p>${cu.note}<p>` : ''}
@@ -185,7 +185,6 @@ function findMisaligned(max_acceptable_misalign:number, ctx: ComparisonContext){
 function renderNotes(allCtx: AllContext): string{
     const ctx = allCtx.comparisonContext
     const config = ctx.config
-    
     const all_notes = ctx.allComparisonUnits
         .map((cu)=>{
             const all_notes = cu.metamorIconMaps.map((map)=>{
@@ -197,6 +196,7 @@ function renderNotes(allCtx: AllContext): string{
                 `
                 return output
             }).join('')
+
             
             const wrapping = `
                 <p>"${cu.prefName}" Notes</p>
@@ -234,7 +234,7 @@ function renderNotes(allCtx: AllContext): string{
         .map((cu) => 
         cu.metamorIconMaps.map((map)=>{
             const output = `
-                <p> ${map.metamorName} alreturn output this note </p>
+                <p> ${map.metamorName} added this note </p>
                 <br>
                 <p> ${map.note} </p>
                 <br>
@@ -256,7 +256,9 @@ function renderNotes(allCtx: AllContext): string{
             break
         }
     const allFormatted = ctx.allComparisonUnits.map((cu)=>{
+        console.log('first map')
         const first_formatted = cu.metamorIconMaps.map((map)=>{
+            
             const normalName = Object.keys(PreferenceIcon)[map.icon.valueOf()]
             const formatted =
                 `
@@ -546,11 +548,8 @@ function renderAnalysis(compCtx: ComparisonContext){
     } = compCtx.config
     
     const all_uncomparable_prefs = compCtx.all_uncomparable_prefs
-    
     const label = document.querySelector<HTMLElement>("#ReanalyseLabel")!;
-
     label.style.display = "revert"
-
     const app = document.querySelector<HTMLDivElement>('#prefsAnalysis')!;
     
     app.innerHTML = `
