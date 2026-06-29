@@ -271,6 +271,40 @@ function globalShortcuts(ctx: AllContext){
   })    
 }
 
+/**
+ * Clear the current context 
+ * @param prefCtx the current preference context
+ */
+function clearAllPrefs(allCtx: AllContext){
+  const prefCtx = allCtx.preferenceContext;
+  const old_prof = prefCtx.currentPreferenceProfile
+  const emptyPrefs = old_prof.metamorPrefs.map((pref)=>{
+    const nex_p: Preference = {
+      iconValue: null,
+      name: pref.name,
+      note: pref.note
+    }
+    return nex_p
+  })
+
+  const empty_profile: PreferenceProfile = {
+    metamorName: old_prof.metamorName,
+    metamorPrefs: emptyPrefs,
+    metamorPrefsByCategory : old_prof.metamorPrefsByCategory,
+    date: old_prof.date
+  }
+  
+  const empty_ctx: PreferenceContext = {
+    currentPref : prefCtx.currentPref,
+    currentPreferenceProfile : empty_profile,
+    currentPrefIcon : null,
+    currentPrefNumber : prefCtx.currentPrefNumber,
+    prefSize : prefCtx.prefSize
+  }
+  allCtx.preferenceContext = empty_ctx
+  console.log(allCtx)
+  render(allCtx)
+}
 
 /**
  * Takes in the current context of a preferenceSelection and loads it in
@@ -310,7 +344,7 @@ export function render(ctx: AllContext){
       ${notes == ''?'':`<br><sub>You added this comment: <br> <span> ${notes} </span> </sub>`}
       
       <br>
-      
+      <button id=clearAllPrefs>Clear all prefs</button>      
       <button id=downloadPrefs>Download your prefs</button>
       <sub>${prefCtx.currentPrefNumber +1}/${prefCtx.prefSize}</sub>
     </section>
@@ -322,6 +356,7 @@ export function render(ctx: AllContext){
   })
   makeConfigWork(app, ctx)
   app.querySelector('#downloadPrefs')?.addEventListener("click", () => downloadPrefs(prefCtx))
+  app.querySelector('#clearAllPrefs')?.addEventListener("click", () => clearAllPrefs(ctx))
 }
 globalShortcuts(allCtx)
 render(allCtx)
