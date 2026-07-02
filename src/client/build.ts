@@ -217,12 +217,35 @@ function handleClear(allctx: AllContext){
  * @param ctx current Preference context
  */
 function makeNavButtonsWork(section: HTMLElement, ctx: AllContext){
-  
   section.querySelector(".prefClear")?.addEventListener("click", () => handleClear(ctx))  
-  
   section.querySelector(".prefBackNav")?.addEventListener("click", () => handleBack(ctx))  
-  
   section.querySelector(".prefForwardNav")?.addEventListener("click", () => handleForward(ctx))
+}
+
+
+function prefShortcuts(section: HTMLElement, allCtx: AllContext){
+  section.addEventListener("keydown", (e : KeyboardEvent)=>{
+      switch (e.key){
+      case "0":
+        handleClear(allCtx)
+        break
+      case "1":
+        handleIcon(PreferenceIcon.OFF_LIMIT, allCtx)
+        break 
+      case "2":
+        handleIcon(PreferenceIcon.PREFER_NOT, allCtx)
+        break 
+      case "3":
+        handleIcon(PreferenceIcon.MAYBE, allCtx)
+        break
+      case "4":
+        handleIcon(PreferenceIcon.PREFER, allCtx)
+        break
+      case "5":
+        handleIcon(PreferenceIcon.MUST, allCtx)
+        break
+      }
+  })
 }
 
 /**
@@ -230,6 +253,9 @@ function makeNavButtonsWork(section: HTMLElement, ctx: AllContext){
  * @param ctx the preference context of everything else
  */
 function globalShortcuts(ctx: AllContext){
+  
+  
+  // global nav shortcuts
   document.addEventListener("keydown", function (e) {
     const event = e as KeyboardEvent
     switch (event.key){
@@ -250,24 +276,6 @@ function globalShortcuts(ctx: AllContext){
         handleNotesSubmit(notesText.value, ctx)
         break
 
-      case "0":
-        handleClear(ctx)
-        break
-      case "1":
-        handleIcon(PreferenceIcon.OFF_LIMIT, ctx)
-        break 
-      case "2":
-        handleIcon(PreferenceIcon.PREFER_NOT, ctx)
-        break 
-      case "3":
-        handleIcon(PreferenceIcon.MAYBE, ctx)
-        break
-      case "4":
-        handleIcon(PreferenceIcon.PREFER, ctx)
-        break
-      case "5":
-        handleIcon(PreferenceIcon.MUST, ctx)
-        break
       default : console.log(event.key);
     }
   })    
@@ -351,15 +359,19 @@ export function render(ctx: AllContext){
       <sub>${prefCtx.currentPrefNumber +1}/${prefCtx.prefSize}</sub>
     </section>
     `;
-
+  
   app.querySelectorAll<HTMLElement>(".preferenceCard").forEach((section)=>{
     makeNavButtonsWork(section, ctx)
     makeIconButtonsWork(section, ctx)
   })
   makeConfigWork(app, ctx)
   makeNotesSelectionWork(app, ctx)
+
   app.querySelector('#downloadPrefs')?.addEventListener("click", () => downloadPrefs(prefCtx))
   app.querySelector('#clearAllPrefs')?.addEventListener("click", () => clearAllPrefs(ctx))
+
+  const prefSelection = document.querySelector("#preferenceSelection")
+  prefShortcuts(prefSelection, ctx)
 }
 globalShortcuts(allCtx)
 render(allCtx)

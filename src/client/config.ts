@@ -32,7 +32,8 @@ export function configRender(config: ComparisonConfig): string{
             <input type='text' id='nameInput'></input>
             <button id='submitName' type='button'>Submit Name</button>
         </label>
-        <label>Maximum Acceptable Misalignment<input type='number' min="0" max="5"></input></label>
+        <br>
+        <label>Maximum Acceptable Misalignment? <input id='misalignConfig' type='number' min="0" max="5"></input></label>
         <br>
         <label>Show full breakdown? <input id='showFullBreakdown'type="checkbox" ${config.show_full ? 'checked': ''}></label>
         <br>
@@ -47,6 +48,14 @@ export function configRender(config: ComparisonConfig): string{
     `
     return output
 }
+
+
+function handleMisalignmentSelection(section: HTMLInputElement, allCtx: AllContext){
+  const input = section.querySelector('#misalignConfig') as HTMLInputElement
+  allCtx.comparisonContext.config.max_acceptable_misalign = input.valueAsNumber
+  render(allCtx)
+}
+
 /**
  * Make the full breakdown section button work
  * @param section 
@@ -142,10 +151,18 @@ export function makeConfigWork(section: HTMLElement, allCtx: AllContext){
       handleName(section, allCtx)
     }
   })
+  // Figure out how to access this info ??? 
+  section.querySelector("#nameInput")?.addEventListener('submit', ({key, preventDefault}: KeyboardEvent)=>{
+    if (key ==="Enter"){
+      preventDefault()
+      handleName(section, allCtx)
+    }
+  })
   section.querySelector("#submitName")?.addEventListener("click", () => handleName(section, allCtx))
   section.querySelector("#showFullBreakdown")?.addEventListener("change", () => handleFullBreakdown(section, allCtx))
   section.querySelector("#showPainPoints")?.addEventListener("change", () => handleShowPainPoints(section,  allCtx))
   section.querySelector("#showPerfectMatches")?.addEventListener("change", () => handleShowPerfectMatches(section, allCtx))
   section.querySelector("#showUncomparable")?.addEventListener("change", () => handleShowUncomparable(section, allCtx))
+  section.querySelector("#misalignConfig")?.addEventListener("submit", ()=>handleMisalignmentSelection(section, allCtx))
   
 }
