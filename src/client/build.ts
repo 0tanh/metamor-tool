@@ -170,10 +170,12 @@ function handleIcon(chosenIcon: PreferenceIconType, allctx: AllContext){
  * Adds context specific functionality for navigating between inputs
  * @param preferenceWithInputs the preference you have picked with its associated inputs
  */
-function preferenceMeta(preferenceWithInputs:string){
+function preferenceMeta(preferenceWithInputs:string,){
   const onePrefInputs  = 
   `
   ${preferenceWithInputs}
+  <section>
+  <section>
   <button class="prefBackNav"> Back </button>
   <button class="prefClear"> Clear </button>
   <button class="prefForwardNav"> Next </button>
@@ -321,7 +323,7 @@ export function render(ctx: AllContext){
     const nameKebab = p.name.replaceAll(" ", "-")
     return `
       <section class="preferenceCard" id="${nameKebab}Card">
-      <p id="plainTextPref">${p.name}</p>
+      <p id="plainTextPref${nameKebab}">${p.name}</p>
       ${preferenceMeta(buttonData(p))}
       </section>
     `})

@@ -32,6 +32,7 @@ export function configRender(config: ComparisonConfig): string{
             <input type='text' id='nameInput'></input>
             <button id='submitName' type='button'>Submit Name</button>
         </label>
+        <label>Maximum Acceptable Misalignment<input type='number' min="0" max="5"></input></label>
         <br>
         <label>Show full breakdown? <input id='showFullBreakdown'type="checkbox" ${config.show_full ? 'checked': ''}></label>
         <br>
@@ -126,7 +127,6 @@ export function makeNotesSelectionWork(section: HTMLElement, allCtx: AllContext)
       const notesSelector = `#${iconString}Button`
       let notesText = section.querySelector(notesSelector) as HTMLInputElement
       
-      
       const handleIconDynamic = () => {
         const chosenIconValue = NotesConfig[icon as keyof typeof NotesConfig];
         handleNotes(chosenIconValue, allCtx)
@@ -136,16 +136,16 @@ export function makeNotesSelectionWork(section: HTMLElement, allCtx: AllContext)
 }
 
 export function makeConfigWork(section: HTMLElement, allCtx: AllContext){
+  section.querySelector("#nameInput")?.addEventListener('keydown', ({key, preventDefault}: KeyboardEvent)=>{
+    if (key ==="Enter"){
+      preventDefault()
+      handleName(section, allCtx)
+    }
+  })
   section.querySelector("#submitName")?.addEventListener("click", () => handleName(section, allCtx))
   section.querySelector("#showFullBreakdown")?.addEventListener("change", () => handleFullBreakdown(section, allCtx))
   section.querySelector("#showPainPoints")?.addEventListener("change", () => handleShowPainPoints(section,  allCtx))
   section.querySelector("#showPerfectMatches")?.addEventListener("change", () => handleShowPerfectMatches(section, allCtx))
   section.querySelector("#showUncomparable")?.addEventListener("change", () => handleShowUncomparable(section, allCtx))
   
-  section.querySelector("#submitName")?.addEventListener('keydown', (event: KeyboardEvent) => {
-    if (event.key === 'Enter') {
-      event.preventDefault(); // Prevent default browser actions if needed
-      handleName(section, allCtx);
-    }
-  });
 }
