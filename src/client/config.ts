@@ -28,9 +28,10 @@ export function configRender(config: ComparisonConfig): string{
     const output = ` 
       <section id='config'>
         <h1>Config</h1>
+        <form id="configForm">
         <label> Whats your name? <br>
             <input type='text' id='nameInput'></input>
-            <button id='submitName' type='button'>Submit Name</button>
+            <button id='submitName' type='submit'>Submit Name</button>
         </label>
         <br>
         <label>Maximum Acceptable Misalignment? <input id='misalignConfig' type='number' min="0" max="5"></input></label>
@@ -44,6 +45,7 @@ export function configRender(config: ComparisonConfig): string{
         <label>Show uncomparable? <input id='showUncomparable'type="checkbox"  ${config.show_uncomparable ? 'checked': ''}></label>
         <br>
         <label>Select what kind of notes you would like to see <br>${notesButton}</label>
+        </form>
       </section>
     `
     return output
@@ -145,24 +147,20 @@ export function makeNotesSelectionWork(section: HTMLElement, allCtx: AllContext)
 }
 
 export function makeConfigWork(section: HTMLElement, allCtx: AllContext){
-  section.querySelector("#nameInput")?.addEventListener('keydown', ({key, preventDefault}: KeyboardEvent)=>{
-    if (key ==="Enter"){
-      preventDefault()
-      handleName(section, allCtx)
-    }
-  })
   // Figure out how to access this info ??? 
-  section.querySelector("#nameInput")?.addEventListener('submit', ({key, preventDefault}: KeyboardEvent)=>{
-    if (key ==="Enter"){
-      preventDefault()
-      handleName(section, allCtx)
-    }
+  const nameInput = section.querySelector<HTMLFormElement>("#configForm")!
+  
+  nameInput.addEventListener('submit', (submitEvent)=>{
+    console.log("name submitted")
+    submitEvent.preventDefault()
+    console.log(submitEvent.type)
+    handleName(section, allCtx)
   })
   section.querySelector("#submitName")?.addEventListener("click", () => handleName(section, allCtx))
   section.querySelector("#showFullBreakdown")?.addEventListener("change", () => handleFullBreakdown(section, allCtx))
   section.querySelector("#showPainPoints")?.addEventListener("change", () => handleShowPainPoints(section,  allCtx))
   section.querySelector("#showPerfectMatches")?.addEventListener("change", () => handleShowPerfectMatches(section, allCtx))
   section.querySelector("#showUncomparable")?.addEventListener("change", () => handleShowUncomparable(section, allCtx))
-  section.querySelector("#misalignConfig")?.addEventListener("submit", ()=>handleMisalignmentSelection(section, allCtx))
+  section.querySelector("#misalignConfig")?.addEventListener("submit", ()=>handleMisalignmentSelection(section as HTMLInputElement, allCtx))
   
 }
