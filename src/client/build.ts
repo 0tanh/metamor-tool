@@ -35,7 +35,7 @@ const config:ComparisonConfig = {
     max_acceptable_misalign : 2, 
     show_full: false,
     notes_config : NotesConfig.ALL_NOTES,
-    show_pain_points : true, //These are points that are diametrically opposed
+    show_pain_points : false, //These are points that are diametrically opposed
     show_perfect_matches : false, //These match perfectly
     show_uncomparable : false
 }
@@ -340,12 +340,14 @@ export function render(ctx: AllContext){
   const currentMatch = current.iconValue == null ?`You have not selected a preference for this yet` : `${current.name} has an icon of ${Object.keys(PreferenceIcon)[current.iconValue-1]}`
   const notes = `${current.note}`
   const app = document.querySelector<HTMLDivElement>('#app')!;
-  
+  const userCopy = 'preference profile'
   app.innerHTML = `
       ${configRender(compCtx.config, prefCtx)}
       <section id='prefSelectionPanel'>
       <h1>Build</h1>
-      ${prefCtx.currentPreferenceProfile.metamorName == '' ? '' :"<h2>"+prefCtx.currentPreferenceProfile.metamorName+"'s preference Profile: </h2>"}
+      
+      <h2>${prefCtx.currentPreferenceProfile.metamorName == '' ? 'Your ' :prefCtx.currentPreferenceProfile.metamorName + "'s"} Preference Profile: </h2>
+      
       <section id="preferenceSelection">
         ${prefList[prefCtx.currentPrefNumber]}
       </section>

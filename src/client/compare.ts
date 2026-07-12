@@ -19,6 +19,7 @@ function render_full_comparison(ctx: ComparisonContext): string{
                 (map)=>{
                     return `
                     <p>
+                    ${map.icon}
                     ${map.metamorName} => ${Object.keys(PreferenceIcon)[map.icon-1]}
                     </p>
                     `}
@@ -52,11 +53,12 @@ function renderMisalign(max_acceptable_misalign: number, ctx: ComparisonContext)
     }).map((compU)=>{
         const formattedMap =`
             ${compU.metamorIconMaps.map((cu)=>{
-                const wordForIcon = Object.keys(PreferenceIcon)[cu.icon.valueOf()] 
+                const wordForIcon = Object.keys(PreferenceIcon)[cu.icon -1] 
                 const metaIcon = `
+                <section class="${compU} ${cu.metamorName} misalignBlock">
                     <p> ${cu.metamorName} => ${wordForIcon}</p>
                     ${cu.note !== '' ? `<p>${cu.metamorName} also added this note: </p><p>${cu.note}<p>` : ''}
-                    
+                </section>
                     `
                 return metaIcon
             }).join('')
@@ -140,7 +142,8 @@ function renderPerfectMatches(ctx: ComparisonContext){
                 `
                 return output
             })
-            const normalName = Object.keys(PreferenceIcon)[cu.metamorIconMaps[0]?.icon.valueOf()]
+            const v = cu.metamorIconMaps[0]?.icon - 1
+            const normalName = Object.keys(PreferenceIcon)[v.valueOf()]
             const formatted =`
                 <p>${cu.prefName} => ${normalName}</p>
                 
@@ -191,20 +194,22 @@ function renderNotes(allCtx: ComparisonContext): string{
         .map((cu)=>{
             const all_notes = cu.metamorIconMaps.map((map)=>{
                 const formatted = `
+                    <section class="${cu.prefName} ${map.metamorName} note">
                     <p> ${map.metamorName} added this note:
                     <br> ${map.note} </p>
-                    <br>
+                    </section>
                 `
-                const note_empty = map.note == '' || map.note == null || map.note == "" || map.note == " " 
+                const note_empty = map.note == '' || map.note == null || map.note == "" || map.note == " "  || map.note == undefined
                 const output = note_empty ? '' : formatted
                 return output
             }).join('')
 
             
             const wrapping = `
+                <section class="${cu.prefName} notesBlock">
                 <p>"${cu.prefName}" Notes</p>
-                <br>
                 <p> ${all_notes} </p>
+                </section>
                 `
 
             return wrapping
@@ -218,7 +223,7 @@ function renderNotes(allCtx: ComparisonContext): string{
                 <br> ${map.note} </p>
                 <br>
             `
-            const note_empty = map.note == '' || map.note == null || map.note == "" || map.note == " " 
+            const note_empty = map.note == '' || map.note == null || map.note == "" || map.note == " "  || map.note == undefined
             const output = note_empty ? '' : formatted
             return output
         }).join('')).join('')
@@ -240,7 +245,7 @@ function renderNotes(allCtx: ComparisonContext): string{
                     <br> ${map.note} </p>
                     <br>
                 `
-                const note_empty = map.note == '' || map.note == null || map.note == "" || map.note == " " 
+                    const note_empty = map.note == '' || map.note == null || map.note == "" || map.note == " " || map.note == undefined
                 const output = note_empty ? '' : formatted
                 return output
         }).join('')).join('')
@@ -263,7 +268,7 @@ function renderNotes(allCtx: ComparisonContext): string{
             
             const first_formatted = cu.metamorIconMaps.map((map)=>{
                 
-            const normalName = Object.keys(PreferenceIcon)[map.icon.valueOf()]
+            const normalName = Object.keys(PreferenceIcon)[map.icon -1]
             const pref_to_name =
             `
             <p>${cu.prefName} => ${normalName}</p>
@@ -281,9 +286,9 @@ function renderNotes(allCtx: ComparisonContext): string{
     }).join('')
 
     const output = `
-    <h2 class='comparisonSection'> Just Notes </h2>
-    <p> Current Note Configuration = ${ctx.config.notes_config} </p>
-    <section>${allFormatted}</section>
+    <h2 class='comparisonSection'> Notes </h2>
+    <p id='CurrentNoteConfigLabel'> Current Note Configuration = ${ctx.config.notes_config} </p>
+    <section id='formattedAndRenderedNotes'>${allFormatted}</section>
     `
     return output
 }
@@ -497,13 +502,13 @@ function handleFileUpload(section: HTMLElement, uploadInput: HTMLInputElement, a
                 const captureCurrentContextHTML = `
                 <label>Start Comparison With Built Context <button id='captureCurrentUser'>Capture</button></label>
                 `
-                const captureCurrentExists = document.querySelector('#captureCurrentUser') != null
+                const captureCurrentExists = document.querySelector('#captureCurrentUser') !== null
                 const currentUserCompare = `
                     ${uploadCtx.toCompare.length >= 1 ? captureCurrentContextHTML: ''}
                     `
                 if (uploadCtx.currentMetamorNumber >= 1 && !captureCurrentExists){
                     section.insertAdjacentHTML('afterbegin', currentUserCompare)
-                    console.log(document.querySelector('#captureCurrentUser'))
+                    console.log(section.querySelector('#captureCurrentUser'))
                     document.querySelector('#captureCurrentUser')?.addEventListener('click', () => addCurrentUserToComparisonContext(section, allCtx))
                 }
 
@@ -528,17 +533,23 @@ function renderAnalyseAndReanalyseButtons(section: HTMLElement, allCtx: AllConte
     const uploadCtx = allCtx.uploadContext
     const comparisonCtx = allCtx.comparisonContext
     const analyseButton =`
-    <label><button id='startComparisonButton'>Start Comparison</button></label>
+    <label id="StartCompLabel"><button id='startComparisonButton'>Start Comparison</button></label>
     `
     
     const reanalyseButton = `
     <label id="ReanalyseLabel" style="display: none;">Reanalyse?<button id='ReanalyseButton'>Reanalyse</button></label>
     `
+
+    const reanalExists: boolean= section.querySelector('#ReanalyseButton') !== null
+    if (!reanalExists){
     section.insertAdjacentHTML('beforeend', reanalyseButton)
     section.querySelector('#ReanalyseButton')?.addEventListener('click', () => handleAnalysis(uploadCtx, comparisonCtx))
-    
-    section.insertAdjacentHTML('beforeend', analyseButton)
-    section.querySelector('#startComparisonButton')?.addEventListener('click', () => handleAnalysis(uploadCtx, comparisonCtx))
+    }
+    const startCompExists: boolean=section.querySelector('#startComparisonButton') !== null
+    if (!startCompExists) {
+        section.insertAdjacentHTML('beforeend', analyseButton)
+        section.querySelector('#startcomparisonbutton')?.addEventListener('click', () => handleAnalysis(uploadCtx, comparisonCtx))
+    }
 }
 
 /**
@@ -598,8 +609,13 @@ function renderAnalysis(compCtx: ComparisonContext){
     } = compCtx.config
     
     const all_uncomparable_prefs = compCtx.all_uncomparable_prefs
+    //Avoid rerendering reanalyse and startComparison Buttons
     const label = document.querySelector<HTMLElement>("#ReanalyseLabel")!;
-    if (label != null){label.style.display = "revert"}
+    if (label !== null){label.style.display = "revert"}
+    
+    const startComp = document.querySelector<HTMLElement>("#StartCompLabel")!
+    if (startComp !== null){startComp.style.display = "revert"}
+    
     const app = document.querySelector<HTMLDivElement>('#prefsAnalysis')!;
     
     app.innerHTML = `
