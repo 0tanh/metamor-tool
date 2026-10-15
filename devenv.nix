@@ -11,12 +11,10 @@
   env.GREET = "devenv";
 
   # https://devenv.sh/packages/
-  packages = with pkgs; [ 
-      git
-      pandoc
-      svelte-language-server
-      svelte-check
-      typescript-language-server
+  packages = with pkgs; [
+    git
+    pandoc
+    typescript-language-server
   ];
 
   # https://devenv.sh/languages/
@@ -24,16 +22,16 @@
   languages = {
     javascript = {
       enable = true;
-      bun ={
+      bun = {
         enable = true;
         install = {
           enable = true;
         };
       };
     };
-   typescript = {
+    typescript = {
       enable = true;
-      };
+    };
   };
 
   # https://devenv.sh/processes/
@@ -46,20 +44,13 @@
   scripts.hello.exec = ''
     echo hello from $GREET
   '';
-  
-  scripts.uv_env.exec = ''
-    echo "Entering python venv"
-    source .venv/bin/activate
-  '';
 
   # https://devenv.sh/basics/
   enterShell = ''
     hello         # Run scripts directly
     git --version # Use packages
-    uv_env
   '';
-  
-  dotenv.enable=true;
+
   # https://devenv.sh/tasks/
   # tasks = {
   #   "myproj:setup".exec = "mytool build";
@@ -77,4 +68,3 @@
 
   # See full reference at https://devenv.sh/reference/options/
 }
-
